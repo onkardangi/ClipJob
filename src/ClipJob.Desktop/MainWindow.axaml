@@ -1,0 +1,26 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="using:ClipJob.Desktop"
+        x:Class="ClipJob.Desktop.MainWindow"
+        x:DataType="local:MainWindow"
+        Title="ClipJob"
+        Width="560"
+        Height="420">
+  <StackPanel Margin="24" Spacing="16">
+    <TextBlock Text="ClipJob" FontSize="28" FontWeight="Bold" />
+    <TextBox PlaceholderText="Search clips" />
+
+    <ItemsControl ItemsSource="{Binding Clips}">
+      <ItemsControl.ItemTemplate>
+        <DataTemplate x:DataType="local:Clip">
+          <Border Margin="0,0,0,8" Padding="12" BorderBrush="Gray" BorderThickness="1" CornerRadius="4">
+            <StackPanel Spacing="4">
+              <TextBlock Text="{Binding Label}" FontWeight="SemiBold" />
+              <TextBlock Text="{Binding Content}" TextWrapping="Wrap" />
+            </StackPanel>
+          </Border>
+        </DataTemplate>
+      </ItemsControl.ItemTemplate>
+    </ItemsControl>
+  </StackPanel>
+</Window>
