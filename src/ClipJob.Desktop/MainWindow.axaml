@@ -26,8 +26,5 @@
         </DataTemplate>
       </ListBox.ItemTemplate>
     </ListBox>
-
-    <TextBlock Text="{Binding ConfirmedClip.Label, StringFormat='Selected: {0}'}"
-               IsVisible="{Binding HasConfirmedClip}" />
   </StackPanel>
 </Window>

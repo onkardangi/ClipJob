@@ -15,7 +15,6 @@ public sealed class MainWindowViewModel : INotifyPropertyChanged
     private string _query = string.Empty;
     private IReadOnlyList<Clip> _visibleClips = AllClips;
     private Clip? _selectedClip = AllClips[0];
-    private Clip? _confirmedClip;
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -60,24 +59,20 @@ public sealed class MainWindowViewModel : INotifyPropertyChanged
         }
     }
 
-    public Clip? ConfirmedClip
-    {
-        get => _confirmedClip;
-        private set
-        {
-            _confirmedClip = value;
-            OnPropertyChanged();
-            OnPropertyChanged(nameof(HasConfirmedClip));
-        }
-    }
-
-    public bool HasConfirmedClip => ConfirmedClip is not null;
-
     public void MoveSelectionDown() => MoveSelection(1);
 
     public void MoveSelectionUp() => MoveSelection(-1);
 
-    public void ConfirmSelection() => ConfirmedClip = SelectedClip;
+    public void Reset()
+    {
+        if (_query.Length > 0)
+        {
+            _query = string.Empty;
+            OnPropertyChanged(nameof(Query));
+        }
+
+        ApplyFilter();
+    }
 
     private void ApplyFilter()
     {

@@ -6,7 +6,7 @@ namespace ClipJob.Desktop;
 
 public sealed partial class MainWindow : Window
 {
-    private readonly IForegroundApplicationService? _foregroundApplicationService;
+    private readonly PasteBackWorkflow? _pasteBackWorkflow;
 
     public MainWindow()
         : this(null)
@@ -15,14 +15,23 @@ public sealed partial class MainWindow : Window
 
     internal MainWindow(IForegroundApplicationService? foregroundApplicationService)
     {
-        _foregroundApplicationService = foregroundApplicationService;
         InitializeComponent();
         DataContext = new MainWindowViewModel();
+        if (foregroundApplicationService is not null)
+        {
+            _pasteBackWorkflow = new PasteBackWorkflow(
+                new AvaloniaClipboardService(this),
+                foregroundApplicationService,
+                new MacOSPasteService());
+        }
+
         Opened += (_, _) => SearchTextBox.Focus();
     }
 
     public void Summon()
     {
+        ((MainWindowViewModel)DataContext!).Reset();
+
         if (!IsVisible)
         {
             Show();
@@ -37,17 +46,9 @@ public sealed partial class MainWindow : Window
         Dispatcher.UIThread.Post(() => SearchTextBox.Focus(), DispatcherPriority.Input);
     }
 
-    private void SearchTextBox_OnKeyDown(object? sender, KeyEventArgs e)
+    private async void SearchTextBox_OnKeyDown(object? sender, KeyEventArgs e)
     {
         var viewModel = (MainWindowViewModel)DataContext!;
-
-        // Temporary Milestone 4 verification action; Milestone 5 will own restoration.
-        if (e.Key == Key.R && e.KeyModifiers.HasFlag(KeyModifiers.Meta))
-        {
-            _foregroundApplicationService?.RestoreCapturedApplication();
-            e.Handled = true;
-            return;
-        }
 
         switch (e.Key)
         {
@@ -60,8 +61,18 @@ public sealed partial class MainWindow : Window
                 e.Handled = true;
                 break;
             case Key.Enter:
-                viewModel.ConfirmSelection();
                 e.Handled = true;
+                if (_pasteBackWorkflow is not null)
+                {
+                    try
+                    {
+                        await _pasteBackWorkflow.ExecuteAsync(viewModel.SelectedClip, Hide);
+                    }
+                    catch (Exception exception)
+                    {
+                        System.Diagnostics.Trace.TraceError($"Paste-back failed: {exception}");
+                    }
+                }
                 break;
             case Key.Escape:
                 Hide();

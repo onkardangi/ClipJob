@@ -177,6 +177,19 @@ Clipboard preservation will also be investigated so using ClipJob does not unnec
 
 Persistence technology is intentionally deferred until after the feasibility spike.
 
+## Local macOS App Bundle
+
+On an Apple Silicon Mac, build the local development app bundle with:
+
+```sh
+./scripts/build-macos-app.sh
+```
+
+The script creates `artifacts/macos/ClipJob.app`. Launch it with
+`open artifacts/macos/ClipJob.app`. To enable paste-back, add that app under
+**System Settings → Privacy & Security → Accessibility**, enable it, then quit
+and relaunch ClipJob.
+
 # Architecture Principles
 
 ClipJob is a small desktop utility. We want clear boundaries without enterprise ceremony.

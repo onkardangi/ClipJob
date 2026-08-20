@@ -10,6 +10,9 @@ public sealed class MacOSForegroundApplicationService : IForegroundApplicationSe
 
     private readonly IntPtr _sharedWorkspace;
     private IntPtr _capturedApplication;
+    private nint _capturedProcessIdentifier;
+
+    public bool HasCapturedApplication => _capturedApplication != IntPtr.Zero;
 
     public MacOSForegroundApplicationService()
     {
@@ -40,13 +43,15 @@ public sealed class MacOSForegroundApplicationService : IForegroundApplicationSe
         objc_retain(application);
         ReleaseCapturedApplication();
         _capturedApplication = application;
+        _capturedProcessIdentifier = processIdentifier;
     }
 
-    public void RestoreCapturedApplication()
+    public async Task<bool> RestoreCapturedApplicationAsync()
     {
         if (_capturedApplication == IntPtr.Zero)
         {
-            return;
+            Trace.TraceWarning("No external application was captured for paste-back.");
+            return false;
         }
 
         var activated = objc_msgSend_bool_nuint(
@@ -57,7 +62,25 @@ public sealed class MacOSForegroundApplicationService : IForegroundApplicationSe
         if (!activated)
         {
             Trace.TraceWarning("macOS did not activate the previously captured application.");
+            return false;
         }
+
+        // Activation completes asynchronously. Polling the frontmost process keeps the
+        // wait bounded without guessing a delay that may paste into ClipJob.
+        var timeout = TimeSpan.FromMilliseconds(750);
+        var startedAt = Stopwatch.GetTimestamp();
+        while (Stopwatch.GetElapsedTime(startedAt) < timeout)
+        {
+            if (GetFrontmostProcessIdentifier() == _capturedProcessIdentifier)
+            {
+                return true;
+            }
+
+            await Task.Delay(20);
+        }
+
+        Trace.TraceWarning("The captured application did not become active before the paste timeout.");
+        return false;
     }
 
     public void Dispose() => ReleaseCapturedApplication();
@@ -71,6 +94,18 @@ public sealed class MacOSForegroundApplicationService : IForegroundApplicationSe
 
         objc_release(_capturedApplication);
         _capturedApplication = IntPtr.Zero;
+        _capturedProcessIdentifier = 0;
+    }
+
+    private nint GetFrontmostProcessIdentifier()
+    {
+        var application = objc_msgSend(
+            _sharedWorkspace,
+            sel_registerName("frontmostApplication"));
+
+        return application == IntPtr.Zero
+            ? 0
+            : objc_msgSend_nint(application, sel_registerName("processIdentifier"));
     }
 
     [DllImport(ObjectiveCLibrary)]

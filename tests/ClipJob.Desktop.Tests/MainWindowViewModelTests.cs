@@ -74,4 +74,17 @@ public sealed class MainWindowViewModelTests
         viewModel.MoveSelectionUp();
         Assert.Equal("linkedin", viewModel.SelectedClip?.Label);
     }
+
+    [Fact]
+    public void ResetClearsQueryAndRestoresFirstSelection()
+    {
+        var viewModel = new MainWindowViewModel();
+        viewModel.MoveSelectionDown();
+
+        viewModel.Reset();
+
+        Assert.Equal(string.Empty, viewModel.Query);
+        Assert.Equal(3, viewModel.VisibleClips.Count);
+        Assert.Equal("email", viewModel.SelectedClip?.Label);
+    }
 }
