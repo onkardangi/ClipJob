@@ -13,16 +13,20 @@ public sealed partial class App : Application
 
     public override void Initialize() => AvaloniaXamlLoader.Load(this);
 
-    public override void OnFrameworkInitializationCompleted()
+    public override async void OnFrameworkInitializationCompleted()
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
+            var clipRepository = SqliteClipRepository.CreateDefault();
+            await clipRepository.InitializeAsync();
+            var clips = await clipRepository.GetAllAsync();
+
             if (OperatingSystem.IsMacOS())
             {
                 _foregroundApplicationService = new MacOSForegroundApplicationService();
             }
 
-            var mainWindow = new MainWindow(_foregroundApplicationService);
+            var mainWindow = new MainWindow(clips, _foregroundApplicationService);
             desktop.MainWindow = mainWindow;
 
             if (OperatingSystem.IsMacOS())

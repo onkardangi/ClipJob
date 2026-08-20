@@ -5,16 +5,24 @@ namespace ClipJob.Desktop;
 
 public sealed class MainWindowViewModel : INotifyPropertyChanged
 {
-    private static readonly IReadOnlyList<Clip> AllClips =
-    [
-        new("email", "test@example.com"),
-        new("linkedin", "https://linkedin.com/in/test"),
-        new("experience", "Built high-throughput REST APIs...")
-    ];
-
+    private readonly IReadOnlyList<Clip> _allClips;
     private string _query = string.Empty;
-    private IReadOnlyList<Clip> _visibleClips = AllClips;
-    private Clip? _selectedClip = AllClips[0];
+    private IReadOnlyList<Clip> _visibleClips;
+    private Clip? _selectedClip;
+
+    public MainWindowViewModel()
+        : this([])
+    {
+    }
+
+    public MainWindowViewModel(IReadOnlyList<Clip> clips)
+    {
+        ArgumentNullException.ThrowIfNull(clips);
+
+        _allClips = clips;
+        _visibleClips = clips;
+        _selectedClip = clips.FirstOrDefault();
+    }
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -77,8 +85,8 @@ public sealed class MainWindowViewModel : INotifyPropertyChanged
     private void ApplyFilter()
     {
         VisibleClips = string.IsNullOrEmpty(Query)
-            ? AllClips
-            : AllClips.Where(clip =>
+            ? _allClips
+            : _allClips.Where(clip =>
                 clip.Label.Contains(Query, StringComparison.OrdinalIgnoreCase) ||
                 clip.Content.Contains(Query, StringComparison.OrdinalIgnoreCase)).ToArray();
 

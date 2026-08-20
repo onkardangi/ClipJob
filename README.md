@@ -102,6 +102,8 @@ We will use small implementation slices with explicit acceptance criteria and va
 
 # Phase 0 — macOS Feasibility Spike
 
+**Status: Complete.**
+
 Before persistence, categories, AI, or application-specific features, prove:
 
 ```text
@@ -334,6 +336,12 @@ Do not advance to feature development until the core workflow is dependable.
 
 # Phase 1 — Personal Clip Library
 
+## Milestone 1 — Persistent Clip Storage
+
+ClipJob stores clips in a local SQLite database in the user's application-data
+directory, outside the repository. Clip-management UI is deferred to a later
+milestone.
+
 After the feasibility spike succeeds:
 
 - create clip
@@ -502,17 +510,12 @@ A LangGraph-based development workflow may eventually automate repetitive implem
 
 # Current Status
 
-**Current phase:** Phase 0 — macOS Feasibility Spike
+**Current phase:** Phase 1 — Personal Clip Library
 
-**Current milestone:** Milestone 1 — Project Foundation
+**Current milestone:** Milestone 1 — Persistent Clip Storage
 
-The immediate goal is the smallest Avalonia application that:
-
-- targets .NET 10
-- builds successfully
-- runs on macOS
-- displays a search field
-- displays three hardcoded clips
+The immediate goal is to load the existing palette's clips from persistent
+local SQLite storage while preserving the validated Phase 0 workflow.
 
 # Guiding Principle
 

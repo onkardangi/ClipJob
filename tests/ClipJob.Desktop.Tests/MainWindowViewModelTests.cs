@@ -5,10 +5,17 @@ namespace ClipJob.Desktop.Tests;
 
 public sealed class MainWindowViewModelTests
 {
+    private static readonly IReadOnlyList<Clip> Clips =
+    [
+        new(Guid.NewGuid(), "email", "test@example.com"),
+        new(Guid.NewGuid(), "linkedin", "https://linkedin.com/in/test"),
+        new(Guid.NewGuid(), "experience", "Built high-throughput REST APIs...")
+    ];
+
     [Fact]
     public void EmptyQueryShowsAllClipsAndSelectsFirst()
     {
-        var viewModel = new MainWindowViewModel();
+        var viewModel = CreateViewModel();
 
         Assert.Equal(3, viewModel.VisibleClips.Count);
         Assert.Equal("email", viewModel.SelectedClip?.Label);
@@ -17,7 +24,8 @@ public sealed class MainWindowViewModelTests
     [Fact]
     public void QueryMatchesLabel()
     {
-        var viewModel = new MainWindowViewModel { Query = "link" };
+        var viewModel = CreateViewModel();
+        viewModel.Query = "link";
 
         Assert.Equal("linkedin", Assert.Single(viewModel.VisibleClips).Label);
     }
@@ -25,7 +33,8 @@ public sealed class MainWindowViewModelTests
     [Fact]
     public void QueryMatchesContent()
     {
-        var viewModel = new MainWindowViewModel { Query = "test@" };
+        var viewModel = CreateViewModel();
+        viewModel.Query = "test@";
 
         Assert.Equal("email", Assert.Single(viewModel.VisibleClips).Label);
     }
@@ -33,7 +42,8 @@ public sealed class MainWindowViewModelTests
     [Fact]
     public void QueryMatchingIsCaseInsensitive()
     {
-        var viewModel = new MainWindowViewModel { Query = "REST" };
+        var viewModel = CreateViewModel();
+        viewModel.Query = "REST";
 
         Assert.Equal("experience", Assert.Single(viewModel.VisibleClips).Label);
     }
@@ -41,7 +51,8 @@ public sealed class MainWindowViewModelTests
     [Fact]
     public void NoMatchClearsResultsAndSelection()
     {
-        var viewModel = new MainWindowViewModel { Query = "missing" };
+        var viewModel = CreateViewModel();
+        viewModel.Query = "missing";
 
         Assert.Empty(viewModel.VisibleClips);
         Assert.Null(viewModel.SelectedClip);
@@ -50,7 +61,7 @@ public sealed class MainWindowViewModelTests
     [Fact]
     public void FilteringResetsSelectionToFirstMatch()
     {
-        var viewModel = new MainWindowViewModel();
+        var viewModel = CreateViewModel();
         viewModel.MoveSelectionDown();
 
         viewModel.Query = "e";
@@ -61,7 +72,7 @@ public sealed class MainWindowViewModelTests
     [Fact]
     public void MovingSelectionRespectsBoundaries()
     {
-        var viewModel = new MainWindowViewModel();
+        var viewModel = CreateViewModel();
 
         viewModel.MoveSelectionUp();
         Assert.Equal("email", viewModel.SelectedClip?.Label);
@@ -78,7 +89,7 @@ public sealed class MainWindowViewModelTests
     [Fact]
     public void ResetClearsQueryAndRestoresFirstSelection()
     {
-        var viewModel = new MainWindowViewModel();
+        var viewModel = CreateViewModel();
         viewModel.MoveSelectionDown();
 
         viewModel.Reset();
@@ -87,4 +98,6 @@ public sealed class MainWindowViewModelTests
         Assert.Equal(3, viewModel.VisibleClips.Count);
         Assert.Equal("email", viewModel.SelectedClip?.Label);
     }
+
+    private static MainWindowViewModel CreateViewModel() => new(Clips);
 }

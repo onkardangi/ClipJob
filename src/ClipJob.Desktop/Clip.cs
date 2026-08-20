@@ -1,3 +1,3 @@
 namespace ClipJob.Desktop;
 
-public sealed record Clip(string Label, string Content);
+public sealed record Clip(Guid Id, string Label, string Content);

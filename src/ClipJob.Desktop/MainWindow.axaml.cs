@@ -9,14 +9,16 @@ public sealed partial class MainWindow : Window
     private readonly PasteBackWorkflow? _pasteBackWorkflow;
 
     public MainWindow()
-        : this(null)
+        : this([], null)
     {
     }
 
-    internal MainWindow(IForegroundApplicationService? foregroundApplicationService)
+    internal MainWindow(
+        IReadOnlyList<Clip> clips,
+        IForegroundApplicationService? foregroundApplicationService)
     {
         InitializeComponent();
-        DataContext = new MainWindowViewModel();
+        DataContext = new MainWindowViewModel(clips);
         if (foregroundApplicationService is not null)
         {
             _pasteBackWorkflow = new PasteBackWorkflow(

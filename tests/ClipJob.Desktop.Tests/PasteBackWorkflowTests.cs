@@ -12,7 +12,7 @@ public sealed class PasteBackWorkflowTests
         var clipboard = new RecordingClipboard(operations, "Amazon");
         var workflow = CreateWorkflow(clipboard, new RecordingForegroundApplication(operations, true), new RecordingPaste(operations));
 
-        var completed = await workflow.ExecuteAsync(new Clip("email", "test@example.com"), () => operations.Add("hide"));
+        var completed = await workflow.ExecuteAsync(new Clip(Guid.NewGuid(), "email", "test@example.com"), () => operations.Add("hide"));
 
         Assert.True(completed);
         Assert.Equal(
@@ -39,7 +39,7 @@ public sealed class PasteBackWorkflowTests
         var operations = new List<string>();
         var workflow = CreateWorkflow(new RecordingClipboard(operations, "Amazon"), new RecordingForegroundApplication(operations, false), new RecordingPaste(operations));
 
-        var completed = await workflow.ExecuteAsync(new Clip("email", "test@example.com"), () => operations.Add("hide"));
+        var completed = await workflow.ExecuteAsync(new Clip(Guid.NewGuid(), "email", "test@example.com"), () => operations.Add("hide"));
 
         Assert.False(completed);
         Assert.Empty(operations);
@@ -52,7 +52,7 @@ public sealed class PasteBackWorkflowTests
         var clipboard = new RecordingClipboard(operations, "Amazon");
         var workflow = CreateWorkflow(clipboard, new RecordingForegroundApplication(operations, true, false), new RecordingPaste(operations));
 
-        var completed = await workflow.ExecuteAsync(new Clip("email", "test@example.com"), () => operations.Add("hide"));
+        var completed = await workflow.ExecuteAsync(new Clip(Guid.NewGuid(), "email", "test@example.com"), () => operations.Add("hide"));
 
         Assert.False(completed);
         Assert.Equal(
@@ -68,7 +68,7 @@ public sealed class PasteBackWorkflowTests
         var clipboard = new RecordingClipboard(operations, null);
         var workflow = CreateWorkflow(clipboard, new RecordingForegroundApplication(operations, true), new RecordingPaste(operations));
 
-        var completed = await workflow.ExecuteAsync(new Clip("email", "test@example.com"), () => operations.Add("hide"));
+        var completed = await workflow.ExecuteAsync(new Clip(Guid.NewGuid(), "email", "test@example.com"), () => operations.Add("hide"));
 
         Assert.True(completed);
         Assert.Null(clipboard.Text);
@@ -91,7 +91,7 @@ public sealed class PasteBackWorkflowTests
                 return Task.CompletedTask;
             });
 
-        var completed = await workflow.ExecuteAsync(new Clip("email", "test@example.com"), () => operations.Add("hide"));
+        var completed = await workflow.ExecuteAsync(new Clip(Guid.NewGuid(), "email", "test@example.com"), () => operations.Add("hide"));
 
         Assert.True(completed);
         Assert.Equal("Stripe", clipboard.Text);
@@ -105,10 +105,29 @@ public sealed class PasteBackWorkflowTests
         var clipboard = new RecordingClipboard(operations, "Amazon") { FailRestoration = true };
         var workflow = CreateWorkflow(clipboard, new RecordingForegroundApplication(operations, true), new RecordingPaste(operations));
 
-        var completed = await workflow.ExecuteAsync(new Clip("email", "test@example.com"), () => operations.Add("hide"));
+        var completed = await workflow.ExecuteAsync(new Clip(Guid.NewGuid(), "email", "test@example.com"), () => operations.Add("hide"));
 
         Assert.True(completed);
         Assert.Equal("test@example.com", clipboard.Text);
+    }
+
+    [Fact]
+    public async Task PasteFailureRestoresPreviousClipboardAndPropagates()
+    {
+        var operations = new List<string>();
+        var clipboard = new RecordingClipboard(operations, "Amazon");
+        var workflow = CreateWorkflow(
+            clipboard,
+            new RecordingForegroundApplication(operations, true),
+            new FailingPaste(operations));
+
+        await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            workflow.ExecuteAsync(new Clip(Guid.NewGuid(), "email", "test@example.com"), () => operations.Add("hide")));
+
+        Assert.Equal(
+            ["clipboard:get", "clipboard:set:test@example.com", "hide", "restore", "paste", "clipboard:get", "clipboard:set:Amazon"],
+            operations);
+        Assert.Equal("Amazon", clipboard.Text);
     }
 
     [Fact]
@@ -133,9 +152,9 @@ public sealed class PasteBackWorkflowTests
                 }
             });
 
-        var first = workflow.ExecuteAsync(new Clip("email", "first"), () => operations.Add("hide:first"));
+        var first = workflow.ExecuteAsync(new Clip(Guid.NewGuid(), "email", "first"), () => operations.Add("hide:first"));
         await waitStarted.Task;
-        var second = workflow.ExecuteAsync(new Clip("email", "second"), () => operations.Add("hide:second"));
+        var second = workflow.ExecuteAsync(new Clip(Guid.NewGuid(), "email", "second"), () => operations.Add("hide:second"));
 
         Assert.DoesNotContain("clipboard:set:second", operations);
         firstCanFinish.SetResult();
@@ -206,5 +225,14 @@ public sealed class PasteBackWorkflowTests
     private sealed class RecordingPaste(List<string> operations) : IPasteService
     {
         public void Paste() => operations.Add("paste");
+    }
+
+    private sealed class FailingPaste(List<string> operations) : IPasteService
+    {
+        public void Paste()
+        {
+            operations.Add("paste");
+            throw new InvalidOperationException("Paste failed.");
+        }
     }
 }
