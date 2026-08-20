@@ -9,6 +9,7 @@ namespace ClipJob.Desktop;
 public sealed partial class App : Application
 {
     private IGlobalHotkeyService? _globalHotkeyService;
+    private IForegroundApplicationService? _foregroundApplicationService;
 
     public override void Initialize() => AvaloniaXamlLoader.Load(this);
 
@@ -16,7 +17,12 @@ public sealed partial class App : Application
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            var mainWindow = new MainWindow();
+            if (OperatingSystem.IsMacOS())
+            {
+                _foregroundApplicationService = new MacOSForegroundApplicationService();
+            }
+
+            var mainWindow = new MainWindow(_foregroundApplicationService);
             desktop.MainWindow = mainWindow;
 
             if (OperatingSystem.IsMacOS())
@@ -26,14 +32,22 @@ public sealed partial class App : Application
                 try
                 {
                     _globalHotkeyService.Register(
-                        () => Dispatcher.UIThread.Post(mainWindow.Summon));
+                        () =>
+                        {
+                            _foregroundApplicationService!.CaptureCurrentApplication();
+                            Dispatcher.UIThread.Post(mainWindow.Summon);
+                        });
                 }
                 catch (InvalidOperationException exception)
                 {
                     Trace.TraceError(exception.Message);
                 }
 
-                desktop.Exit += (_, _) => _globalHotkeyService.Dispose();
+                desktop.Exit += (_, _) =>
+                {
+                    _globalHotkeyService.Dispose();
+                    _foregroundApplicationService?.Dispose();
+                };
             }
         }
 
