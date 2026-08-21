@@ -1,19 +1,24 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         x:Class="ClipJob.Desktop.ClipEditorWindow"
-        Width="460" Height="360" CanResize="False" WindowStartupLocation="CenterOwner">
-  <Grid Margin="20" RowDefinitions="Auto,Auto,Auto,*,Auto,Auto" RowSpacing="8">
-    <TextBlock x:Name="Heading" Grid.Row="0" FontSize="22" FontWeight="SemiBold" />
-    <TextBlock Grid.Row="1" Text="Label" />
-    <TextBox x:Name="LabelTextBox" Grid.Row="2" />
-    <StackPanel Grid.Row="3" Spacing="8">
-      <TextBlock Text="Content" />
-      <TextBox x:Name="ContentTextBox" Height="150" AcceptsReturn="True" TextWrapping="Wrap" />
-    </StackPanel>
-    <TextBlock x:Name="ValidationMessage" Grid.Row="4" Foreground="Crimson" />
-    <StackPanel Grid.Row="5" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
+        Width="520" Height="440" MinWidth="440" MinHeight="360"
+        WindowStartupLocation="CenterOwner" KeyDown="Window_OnKeyDown">
+  <Grid Margin="20" RowDefinitions="Auto,Auto,Auto,Auto,*,Auto,Auto" RowSpacing="8">
+    <TextBlock x:Name="Heading" Grid.Row="0" FontSize="20" FontWeight="SemiBold" Margin="0,0,0,4" />
+    <TextBlock Grid.Row="1" Text="Label" FontWeight="SemiBold" />
+    <TextBox x:Name="LabelTextBox" Grid.Row="2" Padding="9,7" TabIndex="0" />
+    <TextBlock Grid.Row="3" Text="Content" FontWeight="SemiBold" Margin="0,4,0,0" />
+    <TextBox x:Name="ContentTextBox"
+             Grid.Row="4"
+             AcceptsReturn="True"
+             TextWrapping="Wrap"
+             VerticalContentAlignment="Top"
+             Padding="9"
+             TabIndex="1" />
+    <TextBlock x:Name="ValidationMessage" Grid.Row="5" Foreground="{DynamicResource SystemControlErrorTextForegroundBrush}" />
+    <StackPanel Grid.Row="6" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
       <Button Content="Cancel" Click="Cancel_OnClick" />
-      <Button Content="Save" Click="Save_OnClick" />
+      <Button Content="Save" Click="Save_OnClick" TabIndex="2" />
     </StackPanel>
   </Grid>
 </Window>

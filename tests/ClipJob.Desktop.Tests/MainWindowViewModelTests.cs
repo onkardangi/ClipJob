@@ -56,6 +56,7 @@ public sealed class MainWindowViewModelTests
 
         Assert.Empty(viewModel.VisibleClips);
         Assert.Null(viewModel.SelectedClip);
+        Assert.True(viewModel.HasNoResults);
     }
 
     [Fact]

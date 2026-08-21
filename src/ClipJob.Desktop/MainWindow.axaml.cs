@@ -33,6 +33,11 @@ public sealed partial class MainWindow : Window
 
     private async void AddClip_OnClick(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
+        await OpenAddClipAsync();
+    }
+
+    private async Task OpenAddClipAsync()
+    {
         var editor = new ClipEditorWindow("Add Clip");
         var result = await editor.ShowDialog<ClipEditorResult?>(this);
         if (result is not null)
@@ -51,9 +56,16 @@ public sealed partial class MainWindow : Window
                 await ShowErrorAsync("The clip could not be created.");
             }
         }
+
+        RestorePaletteFocus();
     }
 
     private async void EditClip_OnClick(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        await OpenEditClipAsync();
+    }
+
+    private async Task OpenEditClipAsync()
     {
         var viewModel = (MainWindowViewModel)DataContext!;
         if (viewModel.SelectedClip is not { } clip)
@@ -79,9 +91,16 @@ public sealed partial class MainWindow : Window
                 await ShowErrorAsync("The clip could not be updated.");
             }
         }
+
+        RestorePaletteFocus();
     }
 
     private async void DeleteClip_OnClick(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        await RequestDeleteClipAsync();
+    }
+
+    private async Task RequestDeleteClipAsync()
     {
         var viewModel = (MainWindowViewModel)DataContext!;
         if (viewModel.SelectedClip is not { } clip)
@@ -102,6 +121,8 @@ public sealed partial class MainWindow : Window
                 await ShowErrorAsync("The clip could not be deleted.");
             }
         }
+
+        RestorePaletteFocus();
     }
 
     private async Task ShowErrorAsync(string message)
@@ -127,6 +148,41 @@ public sealed partial class MainWindow : Window
         Activate();
         Dispatcher.UIThread.Post(() => SearchTextBox.Focus(), DispatcherPriority.Input);
     }
+
+    private async void Window_OnKeyDown(object? sender, KeyEventArgs e)
+    {
+        if (!e.KeyModifiers.HasFlag(KeyModifiers.Meta))
+        {
+            return;
+        }
+
+        switch (e.Key)
+        {
+            case Key.N:
+                e.Handled = true;
+                await OpenAddClipAsync();
+                break;
+            case Key.E:
+                e.Handled = true;
+                await OpenEditClipAsync();
+                break;
+            case Key.Back:
+                e.Handled = true;
+                await RequestDeleteClipAsync();
+                break;
+        }
+    }
+
+    private void ResultsListBox_OnSelectionChanged(object? sender, SelectionChangedEventArgs e)
+    {
+        if (((MainWindowViewModel)DataContext!).SelectedClip is { } selectedClip)
+        {
+            ResultsListBox.ScrollIntoView(selectedClip);
+        }
+    }
+
+    private void RestorePaletteFocus() =>
+        Dispatcher.UIThread.Post(() => SearchTextBox.Focus(), DispatcherPriority.Input);
 
     private async void SearchTextBox_OnKeyDown(object? sender, KeyEventArgs e)
     {

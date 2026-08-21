@@ -56,6 +56,7 @@ public sealed class MainWindowViewModel : INotifyPropertyChanged
         {
             _visibleClips = value;
             OnPropertyChanged();
+            OnPropertyChanged(nameof(HasNoResults));
         }
     }
 
@@ -76,6 +77,8 @@ public sealed class MainWindowViewModel : INotifyPropertyChanged
     }
 
     public bool HasSelection => SelectedClip is not null;
+
+    public bool HasNoResults => VisibleClips.Count == 0;
 
     public void MoveSelectionDown() => MoveSelection(1);
 
