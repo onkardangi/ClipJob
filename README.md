@@ -342,6 +342,13 @@ ClipJob stores clips in a local SQLite database in the user's application-data
 directory, outside the repository. Clip-management UI is deferred to a later
 milestone.
 
+**Status: Complete.**
+
+## Milestone 2 — Clip CRUD
+
+Create, edit, and delete clips inside ClipJob while keeping the palette current
+and persisting changes across restarts.
+
 After the feasibility spike succeeds:
 
 - create clip
@@ -512,10 +519,10 @@ A LangGraph-based development workflow may eventually automate repetitive implem
 
 **Current phase:** Phase 1 — Personal Clip Library
 
-**Current milestone:** Milestone 1 — Persistent Clip Storage
+**Current milestone:** Milestone 2 — Clip CRUD
 
-The immediate goal is to load the existing palette's clips from persistent
-local SQLite storage while preserving the validated Phase 0 workflow.
+The immediate goal is to manage persisted clips inside ClipJob while preserving
+the validated Phase 0 workflow.
 
 # Guiding Principle
 

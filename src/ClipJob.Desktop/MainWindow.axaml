@@ -6,7 +6,7 @@
         Title="ClipJob"
         Width="560"
         Height="420">
-  <Grid Margin="24" RowDefinitions="Auto,Auto,*" RowSpacing="16">
+  <Grid Margin="24" RowDefinitions="Auto,Auto,*,Auto" RowSpacing="16">
     <TextBlock Grid.Row="0" Text="ClipJob" FontSize="28" FontWeight="Bold" />
     <TextBox x:Name="SearchTextBox"
              Grid.Row="1"
@@ -28,5 +28,10 @@
         </DataTemplate>
       </ListBox.ItemTemplate>
     </ListBox>
+    <StackPanel Grid.Row="3" Orientation="Horizontal" Spacing="8">
+      <Button Content="+ Add Clip" Click="AddClip_OnClick" />
+      <Button Content="Edit" Click="EditClip_OnClick" IsEnabled="{Binding HasSelection}" />
+      <Button Content="Delete" Click="DeleteClip_OnClick" IsEnabled="{Binding HasSelection}" />
+    </StackPanel>
   </Grid>
 </Window>

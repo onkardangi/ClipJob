@@ -45,6 +45,79 @@ public sealed class SqliteClipRepositoryTests : IDisposable
         Assert.Equal(content, clip.Content);
     }
 
+    [Fact]
+    public async Task AddPersistsMultilineUnicodeAfterReopen()
+    {
+        var databasePath = GetDatabasePath();
+        var repository = new SqliteClipRepository(databasePath);
+        await repository.InitializeAsync();
+        var clip = new Clip(Guid.NewGuid(), "unicode", "Résumé 🚀\nSecond line");
+
+        await repository.AddAsync(clip);
+
+        var reopened = new SqliteClipRepository(databasePath);
+        Assert.Equal(clip, Assert.Single(await reopened.GetAllAsync(), item => item.Id == clip.Id));
+    }
+
+    [Fact]
+    public async Task UpdatePersistsValuesAndIdAfterReopen()
+    {
+        var databasePath = GetDatabasePath();
+        var repository = new SqliteClipRepository(databasePath);
+        await repository.InitializeAsync();
+        var id = Guid.NewGuid();
+        await repository.AddAsync(new Clip(id, "role", "Engineer"));
+
+        await repository.UpdateAsync(new Clip(id, "target-role", "Senior Engineer"));
+
+        var reopened = new SqliteClipRepository(databasePath);
+        var clip = Assert.Single(await reopened.GetAllAsync(), item => item.Id == id);
+        Assert.Equal("target-role", clip.Label);
+        Assert.Equal("Senior Engineer", clip.Content);
+    }
+
+    [Fact]
+    public async Task DeletePersistsAfterReopen()
+    {
+        var databasePath = GetDatabasePath();
+        var repository = new SqliteClipRepository(databasePath);
+        await repository.InitializeAsync();
+        var clip = new Clip(Guid.NewGuid(), "temporary", "Delete me");
+        await repository.AddAsync(clip);
+
+        await repository.DeleteAsync(clip.Id);
+
+        var reopened = new SqliteClipRepository(databasePath);
+        Assert.DoesNotContain(await reopened.GetAllAsync(), item => item.Id == clip.Id);
+    }
+
+    [Fact]
+    public async Task DuplicateLabelIsRejectedCaseInsensitivelyWithoutChangingData()
+    {
+        var databasePath = GetDatabasePath();
+        var repository = new SqliteClipRepository(databasePath);
+        await repository.InitializeAsync();
+        var before = await repository.GetAllAsync();
+
+        await Assert.ThrowsAsync<SqliteException>(() =>
+            repository.AddAsync(new Clip(Guid.NewGuid(), "EMAIL", "Other")));
+
+        Assert.Equal(before, await repository.GetAllAsync());
+    }
+
+    [Fact]
+    public async Task InitializeReportsExistingDuplicateLabelsWithoutDeletingData()
+    {
+        var databasePath = GetDatabasePath();
+        await CreateLegacyDatabaseWithDuplicatesAsync(databasePath);
+        var repository = new SqliteClipRepository(databasePath);
+
+        var exception = await Assert.ThrowsAsync<InvalidOperationException>(repository.InitializeAsync);
+
+        Assert.Contains("duplicate labels", exception.Message);
+        Assert.Equal(2, await CountClipsAsync(databasePath));
+    }
+
     public void Dispose()
     {
         if (Directory.Exists(_directory))
@@ -78,5 +151,28 @@ public sealed class SqliteClipRepositoryTests : IDisposable
         command.Parameters.AddWithValue("$label", label);
         command.Parameters.AddWithValue("$content", content);
         await command.ExecuteNonQueryAsync();
+    }
+
+    private static async Task CreateLegacyDatabaseWithDuplicatesAsync(string databasePath)
+    {
+        await using var connection = new SqliteConnection($"Data Source={databasePath}");
+        await connection.OpenAsync();
+        await using var command = connection.CreateCommand();
+        command.CommandText =
+            """
+            CREATE TABLE Clip (Id TEXT PRIMARY KEY NOT NULL, Label TEXT NOT NULL, Content TEXT NOT NULL);
+            INSERT INTO Clip VALUES ('1', 'email', 'first');
+            INSERT INTO Clip VALUES ('2', 'EMAIL', 'second');
+            """;
+        await command.ExecuteNonQueryAsync();
+    }
+
+    private static async Task<long> CountClipsAsync(string databasePath)
+    {
+        await using var connection = new SqliteConnection($"Data Source={databasePath}");
+        await connection.OpenAsync();
+        await using var command = connection.CreateCommand();
+        command.CommandText = "SELECT COUNT(*) FROM Clip;";
+        return (long)(await command.ExecuteScalarAsync())!;
     }
 }

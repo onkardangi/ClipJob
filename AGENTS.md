@@ -398,50 +398,29 @@ Readable, boring code is preferred when it solves the problem correctly.
 
 Current phase:
 
-**Phase 0 — macOS Feasibility Spike**
+**Phase 1 — Personal Clip Library**
 
-The immediate objective is to prove:
-
-```text
-Other application
-      ↓
-Global shortcut
-      ↓
-ClipJob search palette
-      ↓
-Select hardcoded clip
-      ↓
-Restore previous application
-      ↓
-Paste selected text
-```
-
-The full product must not be built until this interaction is proven reliable.
-
-Refer to `README.md` for the milestone roadmap.
+The Phase 0 workflow and persistent clip storage are complete. Preserve that
+behavior while adding only the functionality required by the current milestone.
 
 # Current Milestone
 
-**Milestone 1 — Project Foundation**
+**Milestone 2 — Create, Edit, and Delete Clips**
 
-The current milestone is limited to establishing:
+The current milestone is limited to:
 
-- .NET 10
-- Avalonia
-- macOS execution
-- a basic window
-- a search textbox
-- three hardcoded clips
+- create clip
+- edit clip
+- delete clip with confirmation
+- immediate palette refresh
+- persistence across restart
 
 Do not implement:
 
-- filtering
-- keyboard navigation
-- global shortcuts
-- clipboard behavior
-- native macOS integration
-- persistence
 - categories
+- aliases
+- favorites
+- variants
 - AI functionality
 
 The current milestone changes only when explicitly instructed.

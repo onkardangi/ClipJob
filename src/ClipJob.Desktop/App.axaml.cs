@@ -26,7 +26,7 @@ public sealed partial class App : Application
                 _foregroundApplicationService = new MacOSForegroundApplicationService();
             }
 
-            var mainWindow = new MainWindow(clips, _foregroundApplicationService);
+            var mainWindow = new MainWindow(clips, clipRepository, _foregroundApplicationService);
             desktop.MainWindow = mainWindow;
 
             if (OperatingSystem.IsMacOS())

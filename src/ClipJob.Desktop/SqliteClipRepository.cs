@@ -73,6 +73,44 @@ public sealed class SqliteClipRepository(string databasePath) : IClipRepository
         return clips;
     }
 
+    public async Task AddAsync(Clip clip)
+    {
+        ArgumentNullException.ThrowIfNull(clip);
+
+        await using var connection = new SqliteConnection(_connectionString);
+        await connection.OpenAsync();
+        await using var command = connection.CreateCommand();
+        command.CommandText = "INSERT INTO Clip (Id, Label, Content) VALUES ($id, $label, $content);";
+        AddClipParameters(command, clip);
+        await command.ExecuteNonQueryAsync();
+    }
+
+    public async Task UpdateAsync(Clip clip)
+    {
+        ArgumentNullException.ThrowIfNull(clip);
+
+        await using var connection = new SqliteConnection(_connectionString);
+        await connection.OpenAsync();
+        await using var command = connection.CreateCommand();
+        command.CommandText =
+            "UPDATE Clip SET Label = $label, Content = $content WHERE Id = $id;";
+        AddClipParameters(command, clip);
+        if (await command.ExecuteNonQueryAsync() == 0)
+        {
+            throw new InvalidOperationException($"Clip '{clip.Id}' does not exist.");
+        }
+    }
+
+    public async Task DeleteAsync(Guid id)
+    {
+        await using var connection = new SqliteConnection(_connectionString);
+        await connection.OpenAsync();
+        await using var command = connection.CreateCommand();
+        command.CommandText = "DELETE FROM Clip WHERE Id = $id;";
+        command.Parameters.AddWithValue("$id", id.ToString());
+        await command.ExecuteNonQueryAsync();
+    }
+
     private static async Task CreateSchemaAsync(SqliteConnection connection, SqliteTransaction transaction)
     {
         await using var command = connection.CreateCommand();
@@ -86,6 +124,26 @@ public sealed class SqliteClipRepository(string databasePath) : IClipRepository
             );
             """;
         await command.ExecuteNonQueryAsync();
+
+        command.CommandText =
+            "CREATE UNIQUE INDEX IF NOT EXISTS IX_Clip_Label_NoCase ON Clip (Label COLLATE NOCASE);";
+        try
+        {
+            await command.ExecuteNonQueryAsync();
+        }
+        catch (SqliteException exception) when (exception.SqliteErrorCode == 19)
+        {
+            throw new InvalidOperationException(
+                "The clip database contains duplicate labels. Rename duplicates before continuing.",
+                exception);
+        }
+    }
+
+    private static void AddClipParameters(SqliteCommand command, Clip clip)
+    {
+        command.Parameters.AddWithValue("$id", clip.Id.ToString());
+        command.Parameters.AddWithValue("$label", clip.Label);
+        command.Parameters.AddWithValue("$content", clip.Content);
     }
 
     private static async Task SeedIfEmptyAsync(SqliteConnection connection, SqliteTransaction transaction)
