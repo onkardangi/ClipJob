@@ -46,6 +46,14 @@ public sealed partial class MainWindow : Window
         };
     }
 
+    private void DragRegion_OnPointerPressed(object? sender, PointerPressedEventArgs e)
+    {
+        if (e.GetCurrentPoint(this).Properties.PointerUpdateKind == PointerUpdateKind.LeftButtonPressed)
+        {
+            BeginMoveDrag(e);
+        }
+    }
+
     private async void AddClip_OnClick(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
         await OpenAddClipAsync();
