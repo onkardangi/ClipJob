@@ -39,8 +39,11 @@ public sealed class MacOSOverlayWindowService : IMacOSOverlayWindowService
     public void OrderFront(Window window)
     {
         var nativeWindow = GetNativeWindow(window);
+        var application = objc_msgSend(objc_getClass("NSApplication"), sel_registerName("sharedApplication"));
+
         objc_msgSend(nativeWindow, sel_registerName("orderFrontRegardless"));
-        window.Activate();
+        objc_msgSend_void_bool(application, sel_registerName("activateIgnoringOtherApps:"), true);
+        objc_msgSend_void_IntPtr(nativeWindow, sel_registerName("makeKeyAndOrderFront:"), IntPtr.Zero);
     }
 
     public void SetFloating(Window window, bool floating)
@@ -94,5 +97,14 @@ public sealed class MacOSOverlayWindowService : IMacOSOverlayWindowService
 
     [DllImport(ObjectiveCLibrary, EntryPoint = "objc_msgSend")]
     private static extern void objc_msgSend_void_nint(IntPtr receiver, IntPtr selector, nint value);
+
+    [DllImport(ObjectiveCLibrary, EntryPoint = "objc_msgSend")]
+    private static extern void objc_msgSend_void_bool(
+        IntPtr receiver,
+        IntPtr selector,
+        [MarshalAs(UnmanagedType.I1)] bool value);
+
+    [DllImport(ObjectiveCLibrary, EntryPoint = "objc_msgSend")]
+    private static extern void objc_msgSend_void_IntPtr(IntPtr receiver, IntPtr selector, IntPtr value);
 
 }
