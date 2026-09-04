@@ -33,6 +33,22 @@
       <Setter Property="Background" Value="{DynamicResource SystemControlHighlightListAccentLowBrush}" />
       <Setter Property="BorderBrush" Value="{DynamicResource SystemControlHighlightAccentBrush}" />
     </Style>
+    <Style Selector="Button.delete-action">
+      <Setter Property="Background" Value="#C42B1C" />
+    </Style>
+    <Style Selector="Button.delete-action:pointerover">
+      <Setter Property="Background" Value="#B52A1D" />
+    </Style>
+    <Style Selector="Button.delete-action:pressed">
+      <Setter Property="Background" Value="#A4262C" />
+    </Style>
+    <Style Selector="Button.edit-action">
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="BorderBrush" Value="{DynamicResource SystemControlForegroundBaseLowBrush}" />
+    </Style>
+    <Style Selector="Button.edit-action:pointerover">
+      <Setter Property="Background" Value="{DynamicResource SystemControlHighlightListLowBrush}" />
+    </Style>
   </Window.Styles>
 
   <Border Margin="12"
@@ -131,6 +147,7 @@
                           Spacing="4">
                 <Button Width="30"
                         Height="28"
+                        Classes="edit-action"
                         Padding="0"
                         Click="EditClip_OnClick"
                         ToolTip.Tip="Edit clip"
@@ -148,6 +165,7 @@
                 </Button>
                 <Button Width="30"
                         Height="28"
+                        Classes="delete-action"
                         Padding="0"
                         Click="DeleteClip_OnClick"
                         ToolTip.Tip="Delete clip"
@@ -157,11 +175,8 @@
                         HorizontalAlignment="Center"
                         VerticalAlignment="Center"
                         Stretch="Uniform"
-                        Data="M 3,5 L 13,5 M 6,5 L 6,14 L 12,14 L 12,5 M 7,2 L 11,2 L 12,5"
-                        Stroke="{DynamicResource SystemControlForegroundBaseHighBrush}"
-                        StrokeThickness="1.4"
-                        StrokeLineCap="Round"
-                        StrokeJoin="Round" />
+                        Data="M 6,19 C 6,20.1 6.9,21 8,21 L 16,21 C 17.1,21 18,20.1 18,19 L 18,7 L 6,7 Z M 8.5,9 L 10,9 L 10,19 L 8.5,19 Z M 14,9 L 15.5,9 L 15.5,19 L 14,19 Z M 15.5,4 L 14.5,3 L 9.5,3 L 8.5,4 L 5,4 L 5,6 L 19,6 L 19,4 Z"
+                        Fill="White" />
                 </Button>
               </StackPanel>
             </Grid>
