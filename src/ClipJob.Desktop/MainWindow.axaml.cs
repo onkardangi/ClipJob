@@ -85,6 +85,11 @@ public sealed partial class MainWindow : Window
 
     private async void EditClip_OnClick(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
+        if (sender is Control { DataContext: Clip clip })
+        {
+            ((MainWindowViewModel)DataContext!).SelectedClip = clip;
+        }
+
         await OpenEditClipAsync();
     }
 
@@ -120,6 +125,11 @@ public sealed partial class MainWindow : Window
 
     private async void DeleteClip_OnClick(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
+        if (sender is Control { DataContext: Clip clip })
+        {
+            ((MainWindowViewModel)DataContext!).SelectedClip = clip;
+        }
+
         await RequestDeleteClipAsync();
     }
 

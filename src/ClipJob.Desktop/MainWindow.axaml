@@ -114,15 +114,56 @@
                SelectionChanged="ResultsListBox_OnSelectionChanged">
         <ListBox.ItemTemplate>
           <DataTemplate x:DataType="local:Clip">
-            <Grid RowDefinitions="Auto,Auto" RowSpacing="3">
-              <TextBlock Text="{Binding Label}" FontSize="15" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
-              <TextBlock Grid.Row="1"
-                         Text="{Binding Content}"
-                         FontSize="12.5"
-                         Opacity="0.64"
-                         MaxLines="2"
-                         TextWrapping="Wrap"
-                         TextTrimming="CharacterEllipsis" />
+            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+              <Grid RowDefinitions="Auto,Auto" RowSpacing="3">
+                <TextBlock Text="{Binding Label}" FontSize="15" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
+                <TextBlock Grid.Row="1"
+                           Text="{Binding Content}"
+                           FontSize="12.5"
+                           Opacity="0.64"
+                           MaxLines="2"
+                           TextWrapping="Wrap"
+                           TextTrimming="CharacterEllipsis" />
+              </Grid>
+              <StackPanel Grid.Column="1"
+                          Orientation="Horizontal"
+                          VerticalAlignment="Center"
+                          Spacing="4">
+                <Button Width="30"
+                        Height="28"
+                        Padding="0"
+                        Click="EditClip_OnClick"
+                        ToolTip.Tip="Edit clip"
+                        AutomationProperties.Name="Edit clip">
+                  <Path Width="15"
+                        Height="15"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Stretch="Uniform"
+                        Data="M 3,13 L 4,9 L 12,1 L 15,4 L 7,12 Z M 10.5,2.5 L 13.5,5.5"
+                        Stroke="{DynamicResource SystemControlForegroundBaseHighBrush}"
+                        StrokeThickness="1.4"
+                        StrokeLineCap="Round"
+                        StrokeJoin="Round" />
+                </Button>
+                <Button Width="30"
+                        Height="28"
+                        Padding="0"
+                        Click="DeleteClip_OnClick"
+                        ToolTip.Tip="Delete clip"
+                        AutomationProperties.Name="Delete clip">
+                  <Path Width="15"
+                        Height="15"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Stretch="Uniform"
+                        Data="M 3,5 L 13,5 M 6,5 L 6,14 L 12,14 L 12,5 M 7,2 L 11,2 L 12,5"
+                        Stroke="{DynamicResource SystemControlForegroundBaseHighBrush}"
+                        StrokeThickness="1.4"
+                        StrokeLineCap="Round"
+                        StrokeJoin="Round" />
+                </Button>
+              </StackPanel>
             </Grid>
           </DataTemplate>
         </ListBox.ItemTemplate>
@@ -141,12 +182,8 @@
       <TextBlock VerticalAlignment="Center"
                  Opacity="0.58"
                  FontSize="12"
-                 Text="↑↓ Navigate    ↵ Paste    ⌘N New    ⌘E Edit" />
-      <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="6">
-        <Button Content="New" Click="AddClip_OnClick" Padding="10,5" />
-        <Button Content="Edit" Click="EditClip_OnClick" IsEnabled="{Binding HasSelection}" Padding="10,5" />
-        <Button Content="Delete" Click="DeleteClip_OnClick" IsEnabled="{Binding HasSelection}" Padding="10,5" />
-      </StackPanel>
+                 Text="↑↓ Select    ↵ Paste    ⌘N New    ⌘E Edit    ⌘⌫ Delete" />
+      <Button Grid.Column="1" Content="New clip" Click="AddClip_OnClick" Padding="11,5" />
     </Grid>
   </Grid>
   </Border>
