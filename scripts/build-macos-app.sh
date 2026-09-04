@@ -22,8 +22,11 @@ cp "$repository_root/packaging/macos/Info.plist" "$app_bundle/Contents/Info.plis
 cp -R "$publish_directory/." "$app_bundle/Contents/MacOS/"
 chmod +x "$app_bundle/Contents/MacOS/ClipJob"
 
-# Ad-hoc signing gives this local development bundle a macOS code identity
-# without requiring an Apple Developer certificate or distribution setup.
+# Keep the local development identity stable across rebuilds so macOS does not
+# invalidate ClipJob's Accessibility grant whenever the executable hash changes.
 codesign --force --deep --sign - "$app_bundle"
+codesign --force --sign - \
+    --requirements '=designated => identifier "com.clipjob.app"' \
+    "$app_bundle"
 
 echo "$app_bundle"

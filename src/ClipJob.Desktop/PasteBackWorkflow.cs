@@ -6,12 +6,16 @@ public sealed class PasteBackWorkflow(
     IClipboardService clipboardService,
     IForegroundApplicationService foregroundApplicationService,
     IPasteService pasteService,
-    Func<Task>? waitForPasteConsumption = null)
+    Func<Task>? waitForPasteConsumption = null,
+    Func<Task>? waitForTargetFocus = null)
 {
-    private static readonly TimeSpan PasteConsumptionDelay = TimeSpan.FromMilliseconds(150);
+    private static readonly TimeSpan TargetFocusDelay = TimeSpan.FromMilliseconds(350);
+    private static readonly TimeSpan PasteConsumptionDelay = TimeSpan.FromMilliseconds(500);
     private readonly SemaphoreSlim _executionLock = new(1, 1);
     private readonly Func<Task> _waitForPasteConsumption = waitForPasteConsumption
         ?? (() => Task.Delay(PasteConsumptionDelay));
+    private readonly Func<Task> _waitForTargetFocus = waitForTargetFocus
+        ?? (() => Task.Delay(TargetFocusDelay));
 
     public async Task<bool> ExecuteAsync(Clip? clip, Action hideClipJob)
     {
@@ -43,6 +47,9 @@ public sealed class PasteBackWorkflow(
                     return false;
                 }
 
+                // macOS can report the application as frontmost before its previous
+                // control has regained keyboard focus, especially across Spaces.
+                await _waitForTargetFocus();
                 pasteService.Paste();
 
                 // CGEventPost does not acknowledge when the target has consumed the

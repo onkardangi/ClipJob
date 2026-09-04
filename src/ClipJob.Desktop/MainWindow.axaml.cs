@@ -7,19 +7,22 @@ namespace ClipJob.Desktop;
 public sealed partial class MainWindow : Window
 {
     private readonly PasteBackWorkflow? _pasteBackWorkflow;
+    private readonly IMacOSOverlayWindowService? _overlayWindowService;
 
     public MainWindow()
-        : this([], null, null)
+        : this([], null, null, null)
     {
     }
 
     internal MainWindow(
         IReadOnlyList<Clip> clips,
         IClipRepository? repository,
-        IForegroundApplicationService? foregroundApplicationService)
+        IForegroundApplicationService? foregroundApplicationService,
+        IMacOSOverlayWindowService? overlayWindowService)
     {
         InitializeComponent();
         DataContext = new MainWindowViewModel(clips, repository);
+        _overlayWindowService = overlayWindowService;
         if (foregroundApplicationService is not null)
         {
             _pasteBackWorkflow = new PasteBackWorkflow(
@@ -28,7 +31,19 @@ public sealed partial class MainWindow : Window
                 new MacOSPasteService());
         }
 
-        Opened += (_, _) => SearchTextBox.Focus();
+        Opened += (_, _) =>
+        {
+            try
+            {
+                _overlayWindowService?.Configure(this);
+            }
+            catch (InvalidOperationException exception)
+            {
+                System.Diagnostics.Trace.TraceError($"macOS overlay configuration failed: {exception.Message}");
+            }
+
+            SearchTextBox.Focus();
+        };
     }
 
     private async void AddClip_OnClick(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
@@ -39,7 +54,7 @@ public sealed partial class MainWindow : Window
     private async Task OpenAddClipAsync()
     {
         var editor = new ClipEditorWindow("Add Clip");
-        var result = await editor.ShowDialog<ClipEditorResult?>(this);
+        var result = await ShowOwnedDialogAsync<ClipEditorResult?>(editor);
         if (result is not null)
         {
             try
@@ -74,7 +89,7 @@ public sealed partial class MainWindow : Window
         }
 
         var editor = new ClipEditorWindow("Edit Clip", clip.Label, clip.Content);
-        var result = await editor.ShowDialog<ClipEditorResult?>(this);
+        var result = await ShowOwnedDialogAsync<ClipEditorResult?>(editor);
         if (result is not null)
         {
             try
@@ -109,7 +124,7 @@ public sealed partial class MainWindow : Window
         }
 
         var confirmation = new ConfirmationWindow(clip.Label);
-        if (await confirmation.ShowDialog<bool>(this))
+        if (await ShowOwnedDialogAsync<bool>(confirmation))
         {
             try
             {
@@ -128,7 +143,20 @@ public sealed partial class MainWindow : Window
     private async Task ShowErrorAsync(string message)
     {
         var dialog = new MessageWindow(message);
-        await dialog.ShowDialog(this);
+        await ShowOwnedDialogAsync<object?>(dialog);
+    }
+
+    private async Task<T> ShowOwnedDialogAsync<T>(Window dialog)
+    {
+        _overlayWindowService?.SetFloating(this, false);
+        try
+        {
+            return await dialog.ShowDialog<T>(this);
+        }
+        finally
+        {
+            _overlayWindowService?.SetFloating(this, true);
+        }
     }
 
     public void Summon()
@@ -145,7 +173,22 @@ public sealed partial class MainWindow : Window
             WindowState = WindowState.Normal;
         }
 
-        Activate();
+        if (_overlayWindowService is not null)
+        {
+            try
+            {
+                _overlayWindowService.OrderFront(this);
+            }
+            catch (InvalidOperationException exception)
+            {
+                System.Diagnostics.Trace.TraceError($"macOS overlay ordering failed: {exception.Message}");
+                Activate();
+            }
+        }
+        else
+        {
+            Activate();
+        }
         Dispatcher.UIThread.Post(() => SearchTextBox.Focus(), DispatcherPriority.Input);
     }
 
@@ -204,11 +247,30 @@ public sealed partial class MainWindow : Window
                 {
                     try
                     {
-                        await _pasteBackWorkflow.ExecuteAsync(viewModel.SelectedClip, Hide);
+                        if (!await _pasteBackWorkflow.ExecuteAsync(viewModel.SelectedClip, Hide))
+                        {
+                            Show();
+                            Activate();
+                            await ShowErrorAsync(
+                                "ClipJob could not return to the previous application. Summon ClipJob with ⌘⇧V while the destination field is focused, then try again.");
+                            RestorePaletteFocus();
+                        }
+                    }
+                    catch (InvalidOperationException exception)
+                    {
+                        System.Diagnostics.Trace.TraceError($"Paste-back failed: {exception}");
+                        Show();
+                        Activate();
+                        await ShowErrorAsync(exception.Message);
+                        RestorePaletteFocus();
                     }
                     catch (Exception exception)
                     {
                         System.Diagnostics.Trace.TraceError($"Paste-back failed: {exception}");
+                        Show();
+                        Activate();
+                        await ShowErrorAsync("ClipJob could not paste the selected clip.");
+                        RestorePaletteFocus();
                     }
                 }
                 break;

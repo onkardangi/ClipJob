@@ -16,7 +16,7 @@ public sealed class PasteBackWorkflowTests
 
         Assert.True(completed);
         Assert.Equal(
-            ["clipboard:get", "clipboard:set:test@example.com", "hide", "restore", "paste", "wait", "clipboard:get", "clipboard:set:Amazon"],
+            ["clipboard:get", "clipboard:set:test@example.com", "hide", "restore", "focus-wait", "paste", "wait", "clipboard:get", "clipboard:set:Amazon"],
             operations);
         Assert.Equal("Amazon", clipboard.Text);
     }
@@ -89,12 +89,18 @@ public sealed class PasteBackWorkflowTests
                 operations.Add("wait");
                 clipboard.ReplaceExternally("Stripe");
                 return Task.CompletedTask;
+            },
+            () =>
+            {
+                operations.Add("focus-wait");
+                return Task.CompletedTask;
             });
 
         var completed = await workflow.ExecuteAsync(new Clip(Guid.NewGuid(), "email", "test@example.com"), () => operations.Add("hide"));
 
         Assert.True(completed);
         Assert.Equal("Stripe", clipboard.Text);
+        Assert.Contains("focus-wait", operations);
         Assert.DoesNotContain("clipboard:set:Amazon", operations);
     }
 
@@ -125,7 +131,7 @@ public sealed class PasteBackWorkflowTests
             workflow.ExecuteAsync(new Clip(Guid.NewGuid(), "email", "test@example.com"), () => operations.Add("hide")));
 
         Assert.Equal(
-            ["clipboard:get", "clipboard:set:test@example.com", "hide", "restore", "paste", "clipboard:get", "clipboard:set:Amazon"],
+            ["clipboard:get", "clipboard:set:test@example.com", "hide", "restore", "focus-wait", "paste", "clipboard:get", "clipboard:set:Amazon"],
             operations);
         Assert.Equal("Amazon", clipboard.Text);
     }
@@ -150,6 +156,11 @@ public sealed class PasteBackWorkflowTests
                     waitStarted.SetResult();
                     await firstCanFinish.Task;
                 }
+            },
+            () =>
+            {
+                operations.Add("focus-wait");
+                return Task.CompletedTask;
             });
 
         var first = workflow.ExecuteAsync(new Clip(Guid.NewGuid(), "email", "first"), () => operations.Add("hide:first"));
@@ -165,11 +176,20 @@ public sealed class PasteBackWorkflowTests
     }
 
     private static PasteBackWorkflow CreateWorkflow(RecordingClipboard clipboard, IForegroundApplicationService foregroundApplication, IPasteService pasteService) =>
-        new(clipboard, foregroundApplication, pasteService, () =>
-        {
-            clipboard.Operations.Add("wait");
-            return Task.CompletedTask;
-        });
+        new(
+            clipboard,
+            foregroundApplication,
+            pasteService,
+            () =>
+            {
+                clipboard.Operations.Add("wait");
+                return Task.CompletedTask;
+            },
+            () =>
+            {
+                clipboard.Operations.Add("focus-wait");
+                return Task.CompletedTask;
+            });
 
     private sealed class RecordingClipboard(List<string> operations, string? initialText) : IClipboardService
     {

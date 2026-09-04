@@ -5,11 +5,15 @@
         x:DataType="local:MainWindowViewModel"
         Title="ClipJob"
         Width="660"
-        Height="460"
+        Height="440"
         MinWidth="560"
         MinHeight="360"
         MaxWidth="760"
         MaxHeight="600"
+        CanResize="False"
+        WindowDecorations="None"
+        Background="Transparent"
+        TransparencyLevelHint="Transparent"
         WindowStartupLocation="CenterScreen"
         KeyDown="Window_OnKeyDown">
   <Window.Styles>
@@ -21,7 +25,14 @@
     </Style>
   </Window.Styles>
 
-  <Grid Margin="16" RowDefinitions="Auto,*,Auto" RowSpacing="10">
+  <Border Margin="12"
+          Padding="16"
+          Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
+          BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}"
+          BorderThickness="1"
+          CornerRadius="12"
+          BoxShadow="0 10 28 0 #66000000">
+  <Grid RowDefinitions="Auto,*,Auto" RowSpacing="10">
     <TextBox x:Name="SearchTextBox"
              Grid.Row="0"
              Text="{Binding Query}"
@@ -72,4 +83,5 @@
       </StackPanel>
     </Grid>
   </Grid>
+  </Border>
 </Window>
