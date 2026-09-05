@@ -57,6 +57,9 @@ public sealed class MainWindowViewModel : INotifyPropertyChanged
             _visibleClips = value;
             OnPropertyChanged();
             OnPropertyChanged(nameof(HasNoResults));
+            OnPropertyChanged(nameof(HasNoClips));
+            OnPropertyChanged(nameof(HasNoSearchResults));
+            OnPropertyChanged(nameof(NoResultsMessage));
         }
     }
 
@@ -79,6 +82,12 @@ public sealed class MainWindowViewModel : INotifyPropertyChanged
     public bool HasSelection => SelectedClip is not null;
 
     public bool HasNoResults => VisibleClips.Count == 0;
+
+    public bool HasNoClips => _allClips.Count == 0;
+
+    public bool HasNoSearchResults => !HasNoClips && HasNoResults;
+
+    public string NoResultsMessage => $"No clips match “{Query}”";
 
     public void MoveSelectionDown() => MoveSelection(1);
 

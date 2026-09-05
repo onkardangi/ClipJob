@@ -184,12 +184,35 @@
         </ListBox.ItemTemplate>
       </ListBox>
 
-      <StackPanel IsVisible="{Binding HasNoResults}"
+      <StackPanel IsVisible="{Binding HasNoClips}"
                   HorizontalAlignment="Center"
                   VerticalAlignment="Center"
-                  Spacing="6">
-        <TextBlock Text="No clips found" FontSize="16" FontWeight="SemiBold" HorizontalAlignment="Center" />
-        <TextBlock Text="⌘N to create a clip" Opacity="0.6" HorizontalAlignment="Center" />
+                  Spacing="8">
+        <TextBlock Text="No clips yet" FontSize="17" FontWeight="SemiBold" HorizontalAlignment="Center" />
+        <TextBlock Text="Create your first reusable clip to get started."
+                   Opacity="0.64"
+                   HorizontalAlignment="Center" />
+        <Button Content="Create first clip"
+                HorizontalAlignment="Center"
+                Padding="12,6"
+                Click="AddClip_OnClick" />
+      </StackPanel>
+
+      <StackPanel IsVisible="{Binding HasNoSearchResults}"
+                  HorizontalAlignment="Center"
+                  VerticalAlignment="Center"
+                  Spacing="8">
+        <TextBlock Text="{Binding NoResultsMessage}"
+                   FontSize="17"
+                   FontWeight="SemiBold"
+                   HorizontalAlignment="Center" />
+        <TextBlock Text="Try a different label or phrase."
+                   Opacity="0.64"
+                   HorizontalAlignment="Center" />
+        <Button Content="Clear search"
+                HorizontalAlignment="Center"
+                Padding="12,6"
+                Click="ClearSearch_OnClick" />
       </StackPanel>
     </Grid>
 

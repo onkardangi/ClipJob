@@ -1,24 +1,49 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         x:Class="ClipJob.Desktop.ClipEditorWindow"
-        Width="520" Height="440" MinWidth="440" MinHeight="360"
+        Width="540" Height="470" MinWidth="460" MinHeight="400"
         WindowStartupLocation="CenterOwner" KeyDown="Window_OnKeyDown">
-  <Grid Margin="20" RowDefinitions="Auto,Auto,Auto,Auto,*,Auto,Auto" RowSpacing="8">
-    <TextBlock x:Name="Heading" Grid.Row="0" FontSize="20" FontWeight="SemiBold" Margin="0,0,0,4" />
-    <TextBlock Grid.Row="1" Text="Label" FontWeight="SemiBold" />
-    <TextBox x:Name="LabelTextBox" Grid.Row="2" Padding="9,7" TabIndex="0" />
-    <TextBlock Grid.Row="3" Text="Content" FontWeight="SemiBold" Margin="0,4,0,0" />
+  <Grid Margin="24" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,*,Auto,Auto" RowSpacing="7">
+    <TextBlock x:Name="Heading" Grid.Row="0" FontSize="22" FontWeight="SemiBold" />
+    <TextBlock Grid.Row="1"
+               Text="Give reusable application text a clear name, then paste it whenever you need it."
+               TextWrapping="Wrap"
+               Opacity="0.65"
+               Margin="0,0,0,8" />
+    <TextBlock Grid.Row="2" Text="Label" FontWeight="SemiBold" />
+    <TextBox x:Name="LabelTextBox"
+             Grid.Row="3"
+             PlaceholderText="For example: LinkedIn profile"
+             Padding="10,8"
+             TabIndex="0" />
+    <TextBlock x:Name="LabelValidationMessage"
+               Grid.Row="4"
+               Foreground="{DynamicResource SystemControlErrorTextForegroundBrush}" />
+    <TextBlock Grid.Row="5" Text="Content" FontWeight="SemiBold" Margin="0,3,0,0" />
     <TextBox x:Name="ContentTextBox"
-             Grid.Row="4"
+             Grid.Row="6"
              AcceptsReturn="True"
+             PlaceholderText="Enter the text ClipJob should paste"
              TextWrapping="Wrap"
              VerticalContentAlignment="Top"
-             Padding="9"
+             Padding="10"
              TabIndex="1" />
-    <TextBlock x:Name="ValidationMessage" Grid.Row="5" Foreground="{DynamicResource SystemControlErrorTextForegroundBrush}" />
-    <StackPanel Grid.Row="6" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
-      <Button Content="Cancel" Click="Cancel_OnClick" />
-      <Button Content="Save" Click="Save_OnClick" TabIndex="2" />
-    </StackPanel>
+    <TextBlock x:Name="ContentValidationMessage"
+               Grid.Row="7"
+               Foreground="{DynamicResource SystemControlErrorTextForegroundBrush}" />
+    <Grid Grid.Row="8" ColumnDefinitions="*,Auto" Margin="0,5,0,0">
+      <TextBlock Text="⌘↵ Save"
+                 VerticalAlignment="Center"
+                 FontSize="12"
+                 Opacity="0.58" />
+      <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+        <Button Content="Cancel" Padding="12,6" Click="Cancel_OnClick" />
+        <Button x:Name="SaveButton"
+                Classes="accent"
+                Padding="12,6"
+                Click="Save_OnClick"
+                TabIndex="2" />
+      </StackPanel>
+    </Grid>
   </Grid>
 </Window>

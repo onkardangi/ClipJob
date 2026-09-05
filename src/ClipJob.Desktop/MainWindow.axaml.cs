@@ -59,9 +59,15 @@ public sealed partial class MainWindow : Window
         await OpenAddClipAsync();
     }
 
+    private void ClearSearch_OnClick(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        ((MainWindowViewModel)DataContext!).Query = string.Empty;
+        RestorePaletteFocus();
+    }
+
     private async Task OpenAddClipAsync()
     {
-        var editor = new ClipEditorWindow("Add Clip");
+        var editor = new ClipEditorWindow("Create clip");
         var result = await ShowOwnedDialogAsync<ClipEditorResult?>(editor);
         if (result is not null)
         {
@@ -101,7 +107,7 @@ public sealed partial class MainWindow : Window
             return;
         }
 
-        var editor = new ClipEditorWindow("Edit Clip", clip.Label, clip.Content);
+        var editor = new ClipEditorWindow("Edit clip", clip.Label, clip.Content);
         var result = await ShowOwnedDialogAsync<ClipEditorResult?>(editor);
         if (result is not null)
         {

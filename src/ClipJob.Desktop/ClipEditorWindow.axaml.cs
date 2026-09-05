@@ -19,6 +19,7 @@ public sealed partial class ClipEditorWindow : Window
         Heading.Text = title;
         LabelTextBox.Text = label;
         ContentTextBox.Text = content;
+        SaveButton.Content = string.IsNullOrEmpty(label) ? "Create clip" : "Save changes";
         Opened += (_, _) =>
         {
             if (string.IsNullOrEmpty(label))
@@ -58,15 +59,20 @@ public sealed partial class ClipEditorWindow : Window
     {
         var label = LabelTextBox.Text ?? string.Empty;
         var content = ContentTextBox.Text ?? string.Empty;
+        LabelValidationMessage.Text = string.Empty;
+        ContentValidationMessage.Text = string.Empty;
+
         if (string.IsNullOrWhiteSpace(label))
         {
-            ValidationMessage.Text = "Label is required.";
+            LabelValidationMessage.Text = "Enter a label for this clip.";
+            LabelTextBox.Focus();
             return;
         }
 
         if (string.IsNullOrWhiteSpace(content))
         {
-            ValidationMessage.Text = "Content is required.";
+            ContentValidationMessage.Text = "Enter the text this clip should paste.";
+            ContentTextBox.Focus();
             return;
         }
 

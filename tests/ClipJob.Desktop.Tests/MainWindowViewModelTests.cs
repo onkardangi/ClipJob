@@ -57,6 +57,18 @@ public sealed class MainWindowViewModelTests
         Assert.Empty(viewModel.VisibleClips);
         Assert.Null(viewModel.SelectedClip);
         Assert.True(viewModel.HasNoResults);
+        Assert.True(viewModel.HasNoSearchResults);
+        Assert.False(viewModel.HasNoClips);
+        Assert.Equal("No clips match “missing”", viewModel.NoResultsMessage);
+    }
+
+    [Fact]
+    public void EmptyLibraryShowsCreateStateInsteadOfSearchState()
+    {
+        var viewModel = new MainWindowViewModel([]);
+
+        Assert.True(viewModel.HasNoClips);
+        Assert.False(viewModel.HasNoSearchResults);
     }
 
     [Fact]
