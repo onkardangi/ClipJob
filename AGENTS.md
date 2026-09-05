@@ -57,10 +57,10 @@ Technology:
 - Avalonia UI
 - MVVM where useful
 - CommunityToolkit.Mvvm when justified
-- SQLite later
+- SQLite through Microsoft.Data.Sqlite
 - xUnit for tests
 
-Native macOS integration will eventually be required for:
+Native macOS integration currently supports:
 
 - global keyboard shortcuts
 - foreground application tracking
@@ -68,7 +68,7 @@ Native macOS integration will eventually be required for:
 - synthetic paste behavior
 - accessibility-related functionality
 
-Do not implement these before their respective milestones.
+Keep these behaviors behind their existing platform boundaries.
 
 # Architecture Rules
 
@@ -78,7 +78,7 @@ macOS-specific APIs must remain behind explicit platform boundaries.
 
 UI code must not directly contain native macOS implementation details.
 
-Potential abstractions may eventually include:
+Current platform abstractions include:
 
 ```text
 IGlobalHotkeyService
@@ -87,9 +87,7 @@ IForegroundApplicationService
 IPasteService
 ```
 
-These are examples of likely boundaries, not instructions to create these interfaces immediately.
-
-Do not create an abstraction until the current milestone requires it.
+Do not add another abstraction until the current milestone requires it.
 
 ## UI
 
@@ -116,19 +114,11 @@ Do not create a separate domain project until the application has enough domain 
 
 ## Persistence
 
-Persistence is not part of the feasibility spike.
+Clip persistence uses SQLite through `Microsoft.Data.Sqlite` and the existing
+`IClipRepository` boundary.
 
-Do not add:
-
-- SQLite
-- EF Core
-- Dapper
-- repositories
-- database migrations
-
-until persistence is explicitly requested.
-
-When persistence is introduced, select the simplest approach that satisfies actual requirements.
+Do not introduce an ORM, generic repository layer, or migration framework
+unless a current requirement cannot be met cleanly by the existing approach.
 
 # Dependency Rules
 
@@ -406,6 +396,8 @@ behavior while adding only the functionality required by the current milestone.
 # Current Milestone
 
 **Milestone 2 — Create, Edit, and Delete Clips**
+
+**Status: Complete.**
 
 The current milestone is limited to:
 

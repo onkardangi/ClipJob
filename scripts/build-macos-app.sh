@@ -13,7 +13,7 @@ mkdir -p "$publish_directory" "$app_bundle/Contents/MacOS" "$app_bundle/Contents
 dotnet publish "$repository_root/src/ClipJob.Desktop/ClipJob.Desktop.csproj" \
     --configuration Release \
     --runtime osx-arm64 \
-    --self-contained false \
+    --self-contained true \
     --output "$publish_directory" \
     -p:AssemblyName=ClipJob \
     -p:UseAppHost=true
