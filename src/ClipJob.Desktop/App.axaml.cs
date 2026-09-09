@@ -1,4 +1,5 @@
 using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
@@ -34,6 +35,7 @@ public sealed partial class App : Application
                 clipRepository,
                 _foregroundApplicationService,
                 overlayWindowService);
+            desktop.ShutdownMode = ShutdownMode.OnExplicitShutdown;
             desktop.MainWindow = mainWindow;
 
             if (OperatingSystem.IsMacOS())
@@ -43,11 +45,7 @@ public sealed partial class App : Application
                 try
                 {
                     _globalHotkeyService.Register(
-                        () =>
-                        {
-                            _foregroundApplicationService!.CaptureCurrentApplication();
-                            Dispatcher.UIThread.Post(mainWindow.Summon);
-                        });
+                        () => Summon(mainWindow));
                 }
                 catch (InvalidOperationException exception)
                 {
@@ -63,5 +61,27 @@ public sealed partial class App : Application
         }
 
         base.OnFrameworkInitializationCompleted();
+    }
+
+    private void ShowClipJob_OnClick(object? sender, EventArgs e)
+    {
+        if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime { MainWindow: MainWindow mainWindow })
+        {
+            Summon(mainWindow);
+        }
+    }
+
+    private void QuitClipJob_OnClick(object? sender, EventArgs e)
+    {
+        if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+        {
+            desktop.TryShutdown();
+        }
+    }
+
+    private void Summon(MainWindow mainWindow)
+    {
+        _foregroundApplicationService?.CaptureCurrentApplication();
+        Dispatcher.UIThread.Post(mainWindow.Summon);
     }
 }

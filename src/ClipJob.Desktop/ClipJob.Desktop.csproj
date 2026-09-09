@@ -7,6 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <AvaloniaResource Include="Assets/MenuBarIcon.png" />
+
     <PackageReference Include="Avalonia" Version="12.1.1" />
     <PackageReference Include="Avalonia.Desktop" Version="12.1.1" />
     <PackageReference Include="Avalonia.Themes.Fluent" Version="12.1.1" />

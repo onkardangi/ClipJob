@@ -29,6 +29,7 @@ ClipJob is a working local prototype. The macOS workflow and the first personal-
 - foreground-application restoration and synthetic paste
 - clipboard text restoration after paste
 - movable and resizable palette
+- menu-bar access to show or quit the application
 - self-contained Apple Silicon application bundle
 
 The local development build is ad-hoc signed. A separate release workflow produces a Developer ID-signed and notarized archive when Apple Developer credentials are configured.
@@ -191,13 +192,14 @@ Completed:
 - paste-back and clipboard text preservation
 - persistent SQLite clip storage
 - create, edit, and delete workflows
+- menu-bar Show and Quit actions
 - Developer ID signing and notarization workflow
 
 Likely next work:
 
 - position the palette on the active application’s display
 - broaden reliability testing across browsers and ATS websites
-- add a user-facing quit/settings surface
+- add a settings surface
 - publish the first versioned, notarized GitHub release
 
 Future product work may include categories, favorites, aliases, answer variants, character-limit assistance, and usage-based organization. These are intentionally excluded until the core workflow is dependable.

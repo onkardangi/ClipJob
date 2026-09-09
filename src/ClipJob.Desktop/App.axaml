@@ -2,6 +2,22 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="ClipJob.Desktop.App"
              RequestedThemeVariant="Default">
+  <TrayIcon.Icons>
+    <TrayIcons>
+      <TrayIcon Icon="/Assets/MenuBarIcon.png"
+                ToolTipText="ClipJob"
+                MacOSProperties.IsTemplateIcon="True">
+        <TrayIcon.Menu>
+          <NativeMenu>
+            <NativeMenuItem Header="Show ClipJob" Click="ShowClipJob_OnClick" />
+            <NativeMenuItemSeparator />
+            <NativeMenuItem Header="Quit ClipJob" Click="QuitClipJob_OnClick" />
+          </NativeMenu>
+        </TrayIcon.Menu>
+      </TrayIcon>
+    </TrayIcons>
+  </TrayIcon.Icons>
+
   <Application.Styles>
     <FluentTheme />
   </Application.Styles>
