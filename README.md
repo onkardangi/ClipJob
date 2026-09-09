@@ -29,6 +29,7 @@ ClipJob is a working local prototype. The macOS workflow and the first personal-
 - foreground-application restoration and synthetic paste
 - clipboard text restoration after paste
 - movable and resizable palette
+- palette placement on the active application’s display
 - menu-bar access to show or quit the application
 - self-contained Apple Silicon application bundle
 
@@ -176,7 +177,6 @@ ClipJob does not currently include telemetry, authentication, cloud synchronizat
 
 ## Known limitations
 
-- On multi-monitor systems, the palette can remain on a different display from the active application. Cross-Space floating is implemented, but active-display placement is not.
 - Native paste behavior still requires manual testing across browsers, full-screen Spaces, and job-application sites.
 - Release bundles are currently Apple Silicon-only. Developer ID signing and notarization require locally configured Apple Developer credentials.
 - Clipboard preservation currently snapshots text. It cannot reconstruct non-text clipboard formats.
@@ -192,12 +192,12 @@ Completed:
 - paste-back and clipboard text preservation
 - persistent SQLite clip storage
 - create, edit, and delete workflows
+- active-application display placement
 - menu-bar Show and Quit actions
 - Developer ID signing and notarization workflow
 
 Likely next work:
 
-- position the palette on the active application’s display
 - broaden reliability testing across browsers and ATS websites
 - add a settings surface
 - publish the first versioned, notarized GitHub release

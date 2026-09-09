@@ -231,6 +231,7 @@ public sealed class PasteBackWorkflowTests
     private sealed class RecordingForegroundApplication(List<string> operations, bool hasCapturedApplication, bool activationSucceeds = true) : IForegroundApplicationService
     {
         public bool HasCapturedApplication => hasCapturedApplication;
+        public int CapturedProcessIdentifier => 0;
         public void CaptureCurrentApplication() { }
 
         public Task<bool> RestoreCapturedApplicationAsync()

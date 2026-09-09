@@ -7,6 +7,7 @@ namespace ClipJob.Desktop;
 public sealed partial class MainWindow : Window
 {
     private readonly PasteBackWorkflow? _pasteBackWorkflow;
+    private readonly IForegroundApplicationService? _foregroundApplicationService;
     private readonly IMacOSOverlayWindowService? _overlayWindowService;
 
     public MainWindow()
@@ -22,6 +23,7 @@ public sealed partial class MainWindow : Window
     {
         InitializeComponent();
         DataContext = new MainWindowViewModel(clips, repository);
+        _foregroundApplicationService = foregroundApplicationService;
         _overlayWindowService = overlayWindowService;
         if (foregroundApplicationService is not null)
         {
@@ -186,6 +188,20 @@ public sealed partial class MainWindow : Window
     public void Summon()
     {
         ((MainWindowViewModel)DataContext!).Reset();
+
+        if (_overlayWindowService is not null && _foregroundApplicationService is not null)
+        {
+            try
+            {
+                _overlayWindowService.PositionForApplication(
+                    this,
+                    _foregroundApplicationService.CapturedProcessIdentifier);
+            }
+            catch (InvalidOperationException exception)
+            {
+                System.Diagnostics.Trace.TraceError($"macOS active-screen placement failed: {exception.Message}");
+            }
+        }
 
         if (!IsVisible)
         {

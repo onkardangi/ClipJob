@@ -14,6 +14,8 @@ public sealed class MacOSForegroundApplicationService : IForegroundApplicationSe
 
     public bool HasCapturedApplication => _capturedApplication != IntPtr.Zero;
 
+    public int CapturedProcessIdentifier => (int)_capturedProcessIdentifier;
+
     public MacOSForegroundApplicationService()
     {
         var workspaceClass = objc_getClass("NSWorkspace");
