@@ -1,5 +1,7 @@
 # ClipJob
 
+[![CI](https://github.com/onkardangi/ClipJob/actions/workflows/ci.yml/badge.svg)](https://github.com/onkardangi/ClipJob/actions/workflows/ci.yml)
+
 ClipJob is a macOS-first desktop utility for saving, finding, and pasting reusable text while completing job applications.
 
 Instead of repeatedly searching a resume, notes file, or previous application, users give frequently used text a memorable label and retrieve it from a keyboard-driven palette.
