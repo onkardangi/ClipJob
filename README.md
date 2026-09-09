@@ -29,7 +29,7 @@ ClipJob is a working local prototype. The macOS workflow and the first personal-
 - movable and resizable palette
 - self-contained Apple Silicon application bundle
 
-The current build is intended for local development and trusted testing. It is ad-hoc signed, not notarized, and not yet packaged as a public release.
+The local development build is ad-hoc signed. A separate release workflow produces a Developer ID-signed and notarized archive when Apple Developer credentials are configured.
 
 ## Why ClipJob
 
@@ -116,6 +116,39 @@ open artifacts/macos/ClipJob.app
 
 The script creates an ad-hoc-signed, self-contained app at `artifacts/macos/ClipJob.app`. The bundle includes the .NET runtime, so a destination Mac does not need .NET installed. It currently targets `osx-arm64` only.
 
+### Build a signed and notarized release
+
+A public distribution requires an Apple Developer Program membership, a
+`Developer ID Application` certificate installed in Keychain, and notarization
+credentials stored with Apple's `notarytool`:
+
+```sh
+xcrun notarytool store-credentials "ClipJob-notary" \
+  --apple-id "you@example.com" \
+  --team-id "YOUR_TEAM_ID"
+```
+
+After `notarytool` prompts for an app-specific password and saves the profile,
+create the release archive with:
+
+```sh
+CLIPJOB_SIGNING_IDENTITY="Developer ID Application: Your Name (TEAMID)" \
+CLIPJOB_NOTARY_PROFILE="ClipJob-notary" \
+./scripts/release-macos-app.sh
+```
+
+The release script:
+
+1. builds the self-contained Apple Silicon app
+2. signs its native binaries with hardened runtime enabled
+3. signs the app with the .NET JIT entitlement
+4. submits it to Apple's notary service and waits for acceptance
+5. staples and validates the notarization ticket
+6. verifies the app with `codesign` and Gatekeeper
+7. creates `artifacts/macos/ClipJob-1.0-macos-arm64.zip`
+
+Credentials remain in the macOS Keychain and are not written to the repository.
+
 ### Enable paste-back
 
 Synthetic paste requires Accessibility permission:
@@ -142,7 +175,7 @@ ClipJob does not currently include telemetry, authentication, cloud synchronizat
 
 - On multi-monitor systems, the palette can remain on a different display from the active application. Cross-Space floating is implemented, but active-display placement is not.
 - Native paste behavior still requires manual testing across browsers, full-screen Spaces, and job-application sites.
-- The distributed bundle is Apple Silicon-only, ad-hoc signed, and not notarized.
+- Release bundles are currently Apple Silicon-only. Developer ID signing and notarization require locally configured Apple Developer credentials.
 - Clipboard preservation currently snapshots text. It cannot reconstruct non-text clipboard formats.
 - The global shortcut is fixed at `⌘⇧V` and may conflict with another application.
 
@@ -156,13 +189,14 @@ Completed:
 - paste-back and clipboard text preservation
 - persistent SQLite clip storage
 - create, edit, and delete workflows
+- Developer ID signing and notarization workflow
 
 Likely next work:
 
 - position the palette on the active application’s display
 - broaden reliability testing across browsers and ATS websites
 - add a user-facing quit/settings surface
-- produce Developer ID-signed and notarized distribution builds
+- publish the first versioned, notarized GitHub release
 
 Future product work may include categories, favorites, aliases, answer variants, character-limit assistance, and usage-based organization. These are intentionally excluded until the core workflow is dependable.
 
