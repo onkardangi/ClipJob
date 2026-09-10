@@ -16,6 +16,8 @@ Search and select a clip
 Return to the application and paste
 ```
 
+![ClipJob search palette showing fictional reusable job-application clips](docs/images/clipjob-palette.png)
+
 ## Current status
 
 ClipJob is a working local prototype. The macOS workflow and the first personal-library milestone are implemented:
@@ -235,7 +237,7 @@ ClipJob does not currently include telemetry, authentication, cloud synchronizat
 
 ## Known limitations
 
-- Native paste behavior still requires manual testing across browsers, full-screen Spaces, and job-application sites.
+- Native paste behavior requires manual testing across browsers, full-screen Spaces, and job-application sites. The repeatable scenarios and results belong in the [`reliability test matrix`](docs/reliability-test-matrix.md).
 - Release bundles are currently Apple Silicon-only and are not Developer ID signed or Apple-notarized, so first launch requires manual approval in macOS Privacy & Security settings.
 - Clipboard preservation currently snapshots text. It cannot reconstruct non-text clipboard formats.
 - A chosen global shortcut can still conflict with another application; ClipJob reports the conflict and keeps the previous working shortcut.
