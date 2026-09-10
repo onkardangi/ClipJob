@@ -2,9 +2,9 @@
 
 [![CI](https://github.com/onkardangi/ClipJob/actions/workflows/ci.yml/badge.svg)](https://github.com/onkardangi/ClipJob/actions/workflows/ci.yml)
 
-ClipJob is a macOS-first desktop utility for saving, finding, and pasting reusable text while completing job applications.
+ClipJob is a keyboard-first macOS menu-bar utility for saving, finding, and pasting reusable text while completing job applications. Press `⌘⇧V`, search by label or content, and paste the selected answer back into the application you were using.
 
-Instead of repeatedly searching a resume, notes file, or previous application, users give frequently used text a memorable label and retrieve it from a keyboard-driven palette.
+Built with C#, .NET 10, Avalonia UI, and SQLite, ClipJob stores only the clips a user intentionally creates. It runs locally without an account, cloud synchronization, or clipboard-history collection.
 
 ```text
 Application field focused
@@ -20,7 +20,7 @@ Return to the application and paste
 
 ## Current status
 
-ClipJob is a working local prototype. The macOS workflow and the first personal-library milestone are implemented:
+ClipJob is a working Apple Silicon preview. The macOS workflow and the first personal-library milestone are implemented:
 
 - configurable global shortcut (defaults to `⌘⇧V`)
 - keyboard-driven search by label or content
