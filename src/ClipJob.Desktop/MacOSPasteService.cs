@@ -12,9 +12,11 @@ public sealed class MacOSPasteService : IPasteService
     private const ulong CommandFlag = 1UL << 20;
     private const uint HidEventTap = 0;
 
+    public static bool IsAccessibilityGranted => AXIsProcessTrusted();
+
     public void Paste()
     {
-        if (!AXIsProcessTrusted())
+        if (!IsAccessibilityGranted)
         {
             throw new InvalidOperationException(
                 "ClipJob needs Accessibility permission to paste. Grant it in System Settings > Privacy & Security > Accessibility, then relaunch ClipJob.");

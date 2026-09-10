@@ -20,7 +20,7 @@ Return to the application and paste
 
 ClipJob is a working local prototype. The macOS workflow and the first personal-library milestone are implemented:
 
-- global `⌘⇧V` shortcut
+- configurable global shortcut (defaults to `⌘⇧V`)
 - keyboard-driven search by label or content
 - arrow-key selection, Enter to paste, and Escape to dismiss
 - create, edit, and delete with confirmation
@@ -31,6 +31,7 @@ ClipJob is a working local prototype. The macOS workflow and the first personal-
 - movable and resizable palette
 - palette placement on the active application’s display
 - menu-bar access to show or quit the application
+- settings with global-shortcut configuration and system-status diagnostics
 - self-contained Apple Silicon application bundle
 
 The local development build is ad-hoc signed. A separate release workflow produces a Developer ID-signed and notarized archive when Apple Developer credentials are configured.
@@ -163,6 +164,11 @@ Synthetic paste requires Accessibility permission:
 4. Quit and reopen ClipJob.
 5. Focus a text field in another application and press `⌘⇧V`.
 
+The shortcut can be changed from **ClipJob menu-bar icon → Settings…**. Click
+the shortcut button, press Command plus a letter (optionally with Shift,
+Option, or Control), and save. The same screen reports whether Accessibility
+permission is available and whether the global shortcut registered correctly.
+
 ## Local data and privacy
 
 Clips are stored at:
@@ -170,6 +176,8 @@ Clips are stored at:
 ```text
 ~/Library/Application Support/ClipJob/clipjob.db
 ```
+
+The selected shortcut is stored alongside it in `settings.json`.
 
 The database is outside the repository and remains on the local Mac. A new empty database receives three example clips containing placeholder data.
 
@@ -180,7 +188,7 @@ ClipJob does not currently include telemetry, authentication, cloud synchronizat
 - Native paste behavior still requires manual testing across browsers, full-screen Spaces, and job-application sites.
 - Release bundles are currently Apple Silicon-only. Developer ID signing and notarization require locally configured Apple Developer credentials.
 - Clipboard preservation currently snapshots text. It cannot reconstruct non-text clipboard formats.
-- The global shortcut is fixed at `⌘⇧V` and may conflict with another application.
+- A chosen global shortcut can still conflict with another application; ClipJob reports the conflict and keeps the previous working shortcut.
 
 ## Roadmap
 
@@ -195,11 +203,11 @@ Completed:
 - active-application display placement
 - menu-bar Show and Quit actions
 - Developer ID signing and notarization workflow
+- configurable global shortcut and system-status settings
 
 Likely next work:
 
 - broaden reliability testing across browsers and ATS websites
-- add a settings surface
 - publish the first versioned, notarized GitHub release
 
 Future product work may include categories, favorites, aliases, answer variants, character-limit assistance, and usage-based organization. These are intentionally excluded until the core workflow is dependable.

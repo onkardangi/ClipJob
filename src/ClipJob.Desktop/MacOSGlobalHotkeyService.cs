@@ -1,4 +1,5 @@
 using System.Runtime.InteropServices;
+using Avalonia.Input;
 
 namespace ClipJob.Desktop;
 
@@ -7,7 +8,8 @@ public sealed class MacOSGlobalHotkeyService : IGlobalHotkeyService
     private const string CarbonFramework = "/System/Library/Frameworks/Carbon.framework/Carbon";
     private const uint CommandKey = 1 << 8;
     private const uint ShiftKey = 1 << 9;
-    private const uint VKeyCode = 9;
+    private const uint OptionKey = 1 << 11;
+    private const uint ControlKey = 1 << 12;
     private const uint KeyboardEventClass = 0x6B657962; // 'keyb'
     private const uint HotKeyPressedEventKind = 6;
 
@@ -21,14 +23,17 @@ public sealed class MacOSGlobalHotkeyService : IGlobalHotkeyService
         _eventHandler = HandleHotKey;
     }
 
-    public void Register(Action onPressed)
+    public void Register(GlobalShortcut shortcut, Action onPressed)
     {
+        ArgumentNullException.ThrowIfNull(shortcut);
         ArgumentNullException.ThrowIfNull(onPressed);
 
-        if (_hotKeyReference != IntPtr.Zero)
+        if (!shortcut.IsValid)
         {
-            throw new InvalidOperationException("The global hotkey is already registered.");
+            throw new InvalidOperationException("The shortcut must include Command and a letter key.");
         }
+
+        Unregister();
 
         _onPressed = onPressed;
 
@@ -50,8 +55,8 @@ public sealed class MacOSGlobalHotkeyService : IGlobalHotkeyService
 
         var hotKeyId = new EventHotKeyId(0x434A4F42, 1); // 'CJOB'
         status = RegisterEventHotKey(
-            VKeyCode,
-            CommandKey | ShiftKey,
+            GetMacKeyCode(shortcut.Key),
+            GetMacModifiers(shortcut.Modifiers),
             hotKeyId,
             GetApplicationEventTarget(),
             0,
@@ -63,11 +68,11 @@ public sealed class MacOSGlobalHotkeyService : IGlobalHotkeyService
             _eventHandlerReference = IntPtr.Zero;
             _onPressed = null;
             throw new InvalidOperationException(
-                $"Could not register Command+Shift+V. Another application may already own it (OSStatus {status}).");
+                $"Could not register {shortcut.DisplayText}. Another application may already own it (OSStatus {status}).");
         }
     }
 
-    public void Dispose()
+    private void Unregister()
     {
         if (_hotKeyReference != IntPtr.Zero)
         {
@@ -83,6 +88,28 @@ public sealed class MacOSGlobalHotkeyService : IGlobalHotkeyService
 
         _onPressed = null;
     }
+
+    public void Dispose() => Unregister();
+
+    private static uint GetMacModifiers(KeyModifiers modifiers)
+    {
+        var result = 0u;
+        if (modifiers.HasFlag(KeyModifiers.Meta)) result |= CommandKey;
+        if (modifiers.HasFlag(KeyModifiers.Shift)) result |= ShiftKey;
+        if (modifiers.HasFlag(KeyModifiers.Alt)) result |= OptionKey;
+        if (modifiers.HasFlag(KeyModifiers.Control)) result |= ControlKey;
+        return result;
+    }
+
+    private static uint GetMacKeyCode(Key key) => key switch
+    {
+        Key.A => 0, Key.S => 1, Key.D => 2, Key.F => 3, Key.H => 4, Key.G => 5,
+        Key.Z => 6, Key.X => 7, Key.C => 8, Key.V => 9, Key.B => 11, Key.Q => 12,
+        Key.W => 13, Key.E => 14, Key.R => 15, Key.Y => 16, Key.T => 17, Key.O => 31,
+        Key.U => 32, Key.I => 34, Key.P => 35, Key.L => 37, Key.J => 38, Key.K => 40,
+        Key.N => 45, Key.M => 46,
+        _ => throw new InvalidOperationException("The shortcut key is not supported.")
+    };
 
     private int HandleHotKey(IntPtr nextHandler, IntPtr eventReference, IntPtr userData)
     {

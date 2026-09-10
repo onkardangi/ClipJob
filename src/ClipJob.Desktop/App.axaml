@@ -10,6 +10,7 @@
         <TrayIcon.Menu>
           <NativeMenu>
             <NativeMenuItem Header="Show ClipJob" Click="ShowClipJob_OnClick" />
+            <NativeMenuItem Header="Settings…" Click="Settings_OnClick" />
             <NativeMenuItemSeparator />
             <NativeMenuItem Header="Quit ClipJob" Click="QuitClipJob_OnClick" />
           </NativeMenu>

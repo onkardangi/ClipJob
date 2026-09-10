@@ -1,0 +1,60 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="ClipJob.Desktop.SettingsWindow"
+        Title="ClipJob Settings"
+        Width="460"
+        Height="330"
+        CanResize="False"
+        WindowStartupLocation="CenterOwner"
+        KeyDown="Window_OnKeyDown">
+  <Grid Margin="24" RowDefinitions="Auto,Auto,Auto,*" RowSpacing="22">
+    <StackPanel Spacing="5">
+      <TextBlock Text="Settings" FontSize="24" FontWeight="SemiBold" />
+      <TextBlock Text="Configure how ClipJob is summoned and check required access."
+                 Opacity="0.65" />
+    </StackPanel>
+
+    <Grid Grid.Row="1" ColumnDefinitions="*,Auto" ColumnSpacing="18">
+      <StackPanel Spacing="4">
+        <TextBlock Text="Global shortcut" FontSize="15" FontWeight="SemiBold" />
+        <TextBlock Text="Click the shortcut, then press Command plus a letter."
+                   FontSize="12" Opacity="0.65" />
+        <TextBlock x:Name="ShortcutErrorText" Foreground="#C42B1C" FontSize="12" />
+      </StackPanel>
+      <Button x:Name="ShortcutButton"
+              Grid.Column="1"
+              MinWidth="92"
+              Padding="14,8"
+              FontSize="16"
+              Click="ShortcutButton_OnClick" />
+    </Grid>
+
+    <StackPanel Grid.Row="2" Spacing="9">
+      <TextBlock Text="System status" FontSize="15" FontWeight="SemiBold" />
+      <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="9">
+        <Ellipse x:Name="AccessibilityIndicator" Width="9" Height="9" VerticalAlignment="Center" />
+        <StackPanel Grid.Column="1">
+          <TextBlock Text="Accessibility permission" />
+          <TextBlock x:Name="AccessibilityDetailText" FontSize="12" Opacity="0.65" />
+        </StackPanel>
+        <Button x:Name="OpenAccessibilityButton"
+                Grid.Column="2"
+                Content="Open Settings"
+                Padding="10,5"
+                Click="OpenAccessibility_OnClick" />
+      </Grid>
+      <Grid ColumnDefinitions="Auto,*" ColumnSpacing="9">
+        <Ellipse x:Name="HotkeyIndicator" Width="9" Height="9" VerticalAlignment="Center" />
+        <StackPanel Grid.Column="1">
+          <TextBlock Text="Global shortcut" />
+          <TextBlock x:Name="HotkeyDetailText" FontSize="12" Opacity="0.65" />
+        </StackPanel>
+      </Grid>
+    </StackPanel>
+
+    <Grid Grid.Row="3" ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8" VerticalAlignment="Bottom">
+      <Button Content="Cancel" Click="Cancel_OnClick" Padding="12,6" />
+      <Button Grid.Column="2" Content="Save" Click="Save_OnClick" Padding="16,6" />
+    </Grid>
+  </Grid>
+</Window>
