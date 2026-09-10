@@ -105,6 +105,31 @@ The codebase deliberately avoids a dependency-injection container, ORM, and gene
 - **Runtime shortcut reconfiguration.** A new shortcut is registered immediately and persisted locally. If macOS reports a conflict, ClipJob surfaces the failure and restores the previous working shortcut rather than leaving the application unreachable.
 - **Small, observable architecture.** Search, selection, validation, persistence, and paste orchestration have automated tests, while native integration stays behind narrow interfaces. CI restores, builds, and runs the test suite on macOS for every push and pull request.
 
+## Architecture
+
+```mermaid
+flowchart LR
+    Hotkey[Carbon global shortcut] --> App[Application coordinator]
+    Tray[Menu-bar controls] --> App
+    App --> Palette[Avalonia palette]
+    App --> Settings[Avalonia settings]
+
+    Palette --> ViewModel[MainWindowViewModel]
+    ViewModel <--> Repository[SQLite clip repository]
+    Settings <--> SettingsStore[Local settings JSON]
+    Settings --> Hotkey
+
+    Palette --> Workflow[PasteBackWorkflow]
+    Workflow --> Clipboard[Clipboard service]
+    Workflow --> Foreground[Foreground application service]
+    Workflow --> Paste[CoreGraphics paste service]
+
+    Foreground --> Overlay[AppKit overlay placement]
+    Overlay --> Palette
+```
+
+The Avalonia layer owns presentation and interaction state. Application workflows coordinate behavior, persistence owns local data, and macOS-specific APIs stay behind the platform boundaries shown at the edges.
+
 ## Repository layout
 
 ```text
