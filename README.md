@@ -97,6 +97,14 @@ Only clips intentionally created by the user are stored. ClipJob does not collec
 
 The codebase deliberately avoids a dependency-injection container, ORM, and general-purpose application frameworks. Platform-specific behavior is kept behind small interfaces where the current workflow needs a boundary.
 
+## Engineering highlights
+
+- **Native macOS workflow from managed code.** ClipJob uses focused platform boundaries around Carbon, AppKit, and CoreGraphics rather than placing native calls in Avalonia views. The UI remains testable while the application can register a system-wide shortcut, track the foreground process, and synthesize paste events.
+- **Reliable paste-back behavior.** Invoking the palette captures the previously active application. Selecting a clip updates the clipboard, restores that application, waits for focus to settle, sends Command-V, and then restores the user's previous clipboard text.
+- **Context-aware window placement.** The overlay follows the display containing the captured application's active window instead of relying on the mouse position or ClipJob's previous screen. It also behaves as a movable, resizable accessory window across macOS Spaces.
+- **Runtime shortcut reconfiguration.** A new shortcut is registered immediately and persisted locally. If macOS reports a conflict, ClipJob surfaces the failure and restores the previous working shortcut rather than leaving the application unreachable.
+- **Small, observable architecture.** Search, selection, validation, persistence, and paste orchestration have automated tests, while native integration stays behind narrow interfaces. CI restores, builds, and runs the test suite on macOS for every push and pull request.
+
 ## Repository layout
 
 ```text
