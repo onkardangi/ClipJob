@@ -34,7 +34,23 @@ ClipJob is a working local prototype. The macOS workflow and the first personal-
 - settings with global-shortcut configuration and system-status diagnostics
 - self-contained Apple Silicon application bundle
 
-The local development build is ad-hoc signed. A separate release workflow produces a Developer ID-signed and notarized archive when Apple Developer credentials are configured.
+The free preview build is ad-hoc signed and is not Apple-notarized. The repository also retains an optional Developer ID signing script for maintainers who configure paid Apple Developer credentials in the future.
+
+## Install the preview
+
+ClipJob currently supports Apple Silicon Macs (M1 or newer). No .NET runtime or developer tools are required.
+
+1. Download `ClipJob-1.0.0-preview.1-macos-arm64.zip` from the [GitHub Releases page](https://github.com/onkardangi/ClipJob/releases).
+2. Double-click the ZIP, then drag `ClipJob.app` into **Applications**.
+3. Control-click ClipJob in Applications and choose **Open**.
+4. Choose **Open** in the macOS warning. If that option is unavailable, try opening ClipJob once, then go to **System Settings → Privacy & Security**, scroll down, and click **Open Anyway**.
+5. In **System Settings → Privacy & Security → Accessibility**, enable ClipJob. If it is not listed, click **+** and select `/Applications/ClipJob.app`.
+6. Quit and reopen ClipJob after granting permission.
+7. Focus a text field and press `⌘⇧V`.
+
+ClipJob appears in the macOS menu bar rather than the Dock. Use its menu-bar icon to show ClipJob, open Settings, or quit.
+
+> **Why does macOS show a warning?** This free preview is not signed with a paid Apple Developer certificate or notarized by Apple. Only download it from this repository. The manual approval is required once when installing the app.
 
 ## Why ClipJob
 
@@ -150,9 +166,10 @@ The release script:
 4. submits it to Apple's notary service and waits for acceptance
 5. staples and validates the notarization ticket
 6. verifies the app with `codesign` and Gatekeeper
-7. creates `artifacts/macos/ClipJob-1.0-macos-arm64.zip`
+7. creates `artifacts/macos/ClipJob-1.0.0-macos-arm64.zip`
 
 Credentials remain in the macOS Keychain and are not written to the repository.
+Repository maintainers can follow [`docs/releasing.md`](docs/releasing.md) to publish the free preview workflow.
 
 ### Enable paste-back
 
@@ -186,7 +203,7 @@ ClipJob does not currently include telemetry, authentication, cloud synchronizat
 ## Known limitations
 
 - Native paste behavior still requires manual testing across browsers, full-screen Spaces, and job-application sites.
-- Release bundles are currently Apple Silicon-only. Developer ID signing and notarization require locally configured Apple Developer credentials.
+- Release bundles are currently Apple Silicon-only and are not Developer ID signed or Apple-notarized, so first launch requires manual approval in macOS Privacy & Security settings.
 - Clipboard preservation currently snapshots text. It cannot reconstruct non-text clipboard formats.
 - A chosen global shortcut can still conflict with another application; ClipJob reports the conflict and keeps the previous working shortcut.
 
@@ -204,11 +221,11 @@ Completed:
 - menu-bar Show and Quit actions
 - Developer ID signing and notarization workflow
 - configurable global shortcut and system-status settings
+- first versioned, self-contained GitHub preview release
 
 Likely next work:
 
 - broaden reliability testing across browsers and ATS websites
-- publish the first versioned, notarized GitHub release
 
 Future product work may include categories, favorites, aliases, answer variants, character-limit assistance, and usage-based organization. These are intentionally excluded until the core workflow is dependable.
 
